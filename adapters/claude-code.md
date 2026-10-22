@@ -21,27 +21,25 @@ How the actions named in Quimera skills map to Claude Code. Verified against the
 
 ## Tiers
 
-| Tier | Model | Effort |
-|---|---|---|
-| fast | `haiku` | `low` |
-| standard | `sonnet` | `medium` |
-| strongest | `opus` | `high`; `xhigh` only for very complex work |
+The model and effort for each tier, in the full and the economic profile, are in `models.md` (Anthropic). In short: full is `opus` high / `sonnet` medium / `haiku` low; economic is `sonnet` medium / `haiku` medium / `haiku` low.
 
 - Never use `max`. Do not pick `fable` unless the user asks.
-- Set the session effort with `/effort <level>`. A subagent's effort comes from the `effort` field of its definition.
+- Set the session effort with `/effort <level>`. A subagent's effort comes from the `effort` field of its definition, so the role agents below carry the profile's model and effort. The installer writes them for the profile: `npx github:mnstechbr/Quimera update --models=economic` (or `--models=full`) switches them.
+- **Applying the profile (kickoff step 8, or when the user switches).** With Anthropic models, run `npx github:mnstechbr/Quimera update --models=<full|economic>`; it updates the kit to the latest version and rewrites only the model and effort of the role agents it installed (an agent the user edited is kept, with the new version beside it as `*.quimera-new`).
+- **Other providers inside Claude Code.** If you run DeepSeek, MiMo or another provider through a launcher that points Claude Code at their endpoint, the launcher decides which real model each alias (`opus`, `sonnet`, `haiku`) calls. For a two-size provider, map `opus` → the large model (DeepSeek V4 Pro, MiMo-V2.6 Pro) and `sonnet` and `haiku` → the small one, keep the **full** role agents (do not use `--models=economic`, which would put reviewers on `sonnet`, the small model), and dispatch every reviewer, including `quimera-interface-reviewer`, with `model: opus`. A whole session launched that way is also a way to hand work to another model: give it the same brief a subagent would get, wait for it to finish, then review.
 
 ## Role agents installed in `.claude/agents/`
 
-| Agent | Model · effort | Use |
-|---|---|---|
-| `quimera-explorer` | haiku · low | Search, read and report. Read-only. |
-| `quimera-implementer` | sonnet · medium | A well-defined part of a plan, with its own files |
-| `quimera-reviewer` | opus · high | Independent review, architecture and adversarial passes. Read-only. |
-| `quimera-security-reviewer` | opus · high | Specialist review: security. Read-only. |
-| `quimera-database-reviewer` | opus · high | Specialist review: database and performance. Read-only. |
-| `quimera-interface-reviewer` | sonnet · medium | Specialist review: interface and accessibility. Read-only. |
+| Agent | Full | Economic | Use |
+|---|---|---|---|
+| `quimera-explorer` | haiku · low | haiku · low | Search, read and report. Read-only. |
+| `quimera-implementer` | sonnet · medium | haiku · medium | A well-defined part of a plan, with its own files |
+| `quimera-reviewer` | opus · high | sonnet · medium | Independent review, architecture and adversarial passes. Read-only. |
+| `quimera-security-reviewer` | opus · high | sonnet · medium | Specialist review: security. Read-only. |
+| `quimera-database-reviewer` | opus · high | sonnet · medium | Specialist review: database and performance. Read-only. |
+| `quimera-interface-reviewer` | sonnet · medium | sonnet · medium | Specialist review: interface and accessibility. Read-only. |
 
-`code-review` decides which reviewers run (its "Specialist reviewers" table). For a general review at Normal depth, pass `model: sonnet` to `quimera-reviewer`; for Risky depth keep its default. At Risky depth, when `quimera-interface-reviewer` is the lead, pass `model: opus`.
+`code-review` decides which reviewers run (its "Specialist reviewers" table). In the full profile: for a general review at Normal depth, pass `model: sonnet` to `quimera-reviewer`; for Risky depth keep its default; at Risky depth, when `quimera-interface-reviewer` is the lead, pass `model: opus`. In the economic profile, keep every agent's default; passing a stronger model needs the user's ok.
 
 ## Discreet mode
 

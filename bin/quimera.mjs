@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // Quimera installer: copies the kit into the current git repository.
 //
-//   quimera init   [--tools=claude,codex,copilot,cursor] [--mode=discreet|open] [--local-only] [--dry-run]
-//   quimera update [--dry-run]     refresh kit files; local edits are kept and the new version is saved as *.quimera-new
+//   quimera init   [--tools=claude,codex,copilot,cursor,antigravity,other] [--mode=discreet|open] [--models=full|economic] [--local-only] [--dry-run]
+//   quimera update [--models=full|economic] [--dry-run]   refresh kit files; local edits are kept and the new version is saved as *.quimera-new
 //   quimera doctor                 check the installation and run the git preflight
 //
 // It only copies Markdown and small Node scripts. It never installs dependencies, never touches
@@ -10,14 +10,22 @@
 
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { appendFileSync, copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync, chmodSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync, chmodSync } from 'node:fs';
 import { dirname, isAbsolute, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const KIT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const VERSION = JSON.parse(readFileSync(join(KIT, 'package.json'), 'utf8')).version;
 const MANIFEST = '.quimera/manifest.json';
-const TOOLS = ['claude', 'codex', 'copilot', 'cursor'];
+const TOOLS = ['claude', 'codex', 'copilot', 'cursor', 'antigravity', 'other'];
+const PROFILES = ['full', 'economic'];
+// Claude Code role agents in the economic model profile (adapters/models.md): reviewers on the
+// mid-size model, code and search on the small one. The full profile keeps each file as shipped.
+const ECONOMIC_AGENTS = {
+  'quimera-explorer.md': ['haiku', 'low'],
+  'quimera-implementer.md': ['haiku', 'medium'],
+  default: ['sonnet', 'medium'],
+};
 
 const [command = 'help', ...rest] = process.argv.slice(2);
 const flag = (name) => rest.find((a) => a === `--${name}` || a.startsWith(`--${name}=`));
@@ -40,7 +48,20 @@ function repoRoot() {
   }
 }
 
-const sha = (path) => createHash('sha256').update(readFileSync(path)).digest('hex');
+const shaOf = (buf) => createHash('sha256').update(buf).digest('hex');
+const sha = (path) => shaOf(readFileSync(path));
+
+// The bytes a kit file should have in this project. Only Claude role agents change, and only
+// their model and effort lines, so the agent bodies are never duplicated in the kit.
+function content(src, dest, models) {
+  const buf = readFileSync(src);
+  if (models !== 'economic' || !dest.startsWith(join('.claude', 'agents'))) return buf;
+  const name = dest.split(/[\\/]/).pop();
+  const [model, effort] = ECONOMIC_AGENTS[name] ?? ECONOMIC_AGENTS.default;
+  return Buffer.from(
+    buf.toString('utf8').replace(/^model: .*$/m, `model: ${model}`).replace(/^effort: .*$/m, `effort: ${effort}`),
+  );
+}
 const walk = (dir) =>
   readdirSync(dir).flatMap((name) => {
     const p = join(dir, name);
@@ -95,6 +116,15 @@ function install({ update }) {
     console.error(`Unknown tool(s): ${bad.join(', ')}. Choose from: ${TOOLS.join(', ')}`);
     process.exit(64);
   }
+  if (flag('models') && !value('models')) {
+    console.error(`--models needs a value: ${PROFILES.join(' or ')}`);
+    process.exit(64);
+  }
+  const models = value('models') ?? manifest.models ?? 'full';
+  if (!PROFILES.includes(models)) {
+    console.error(`Unknown model profile: ${models}. Choose from: ${PROFILES.join(', ')}`);
+    process.exit(64);
+  }
 
   const result = { written: [], kept: [], skipped: [], removed: [], orphaned: [] };
   const files = { ...manifest.files };
@@ -102,26 +132,40 @@ function install({ update }) {
   for (const [src, dest] of pairs) {
     const exists = existsSync(dest);
     const ours = files[dest];
+    const next = content(src, dest, models);
     if (exists && !ours) {
       // A file we did not create: never touch it.
       result.skipped.push(dest);
       continue;
     }
+    const newCopy = `${dest}.quimera-new`;
+    const dropStaleCopy = () => {
+      if (!dryRun && existsSync(newCopy)) rmSync(newCopy);
+    };
     if (exists && ours && sha(dest) !== ours) {
-      // We created it but it was edited locally: keep the edit, offer the new version beside it.
-      if (sha(src) !== ours) {
+      // We created it but it was edited locally.
+      if (sha(dest) === shaOf(next)) {
+        // The edit already matches the new version: adopt it, nothing to offer.
+        if (!dryRun) files[dest] = sha(dest);
+        dropStaleCopy();
+      } else if (shaOf(next) !== ours) {
+        // Keep the edit and offer the new version beside it.
         if (!dryRun) {
           mkdirSync(dirname(dest), { recursive: true });
-          copyFileSync(src, `${dest}.quimera-new`);
+          writeFileSync(newCopy, next);
         }
         result.kept.push(dest);
-      }
+      } else dropStaleCopy(); // the kit's version did not change: an older offer is stale
       continue;
     }
-    if (exists && ours && sha(src) === ours) continue; // already current
+    if (exists && ours && shaOf(next) === ours) {
+      dropStaleCopy(); // already current
+      continue;
+    }
+    dropStaleCopy();
     if (!dryRun) {
       mkdirSync(dirname(dest), { recursive: true });
-      copyFileSync(src, dest);
+      writeFileSync(dest, next);
       if (/\.mjs$|commit-msg$/.test(dest)) chmodSync(dest, 0o755);
       files[dest] = sha(dest);
     }
@@ -152,7 +196,7 @@ function install({ update }) {
       }
     })();
     mkdirSync('.quimera', { recursive: true });
-    writeFileSync(MANIFEST, JSON.stringify({ version: VERSION, source, tools, files }, null, 2) + '\n');
+    writeFileSync(MANIFEST, JSON.stringify({ version: VERSION, source, tools, models, files }, null, 2) + '\n');
   }
 
   // *.quimera-new files are local review copies: keep them out of commits on this machine.
@@ -173,7 +217,7 @@ function install({ update }) {
   if (!update && flag('local-only') && !dryRun) spawnSync('node', ['.quimera/scripts/local-only.mjs'], { stdio: 'inherit' });
 
   const n = (a) => a.length;
-  console.log(`${dryRun ? '[dry run] ' : ''}Quimera ${VERSION} ${update ? 'updated' : 'installed'} · tools: ${tools.join(', ')}`);
+  console.log(`${dryRun ? '[dry run] ' : ''}Quimera ${VERSION} ${update ? 'updated' : 'installed'} · tools: ${tools.join(', ')} · models: ${models}`);
   console.log(`  written: ${n(result.written)} file(s)`);
   if (n(result.kept)) console.log(`  kept your edits in ${n(result.kept)} file(s); the new version is next to each as *.quimera-new:\n${result.kept.map((f) => `    ${f}`).join('\n')}`);
   if (n(result.removed)) console.log(`  removed ${n(result.removed)} file(s) the kit no longer ships`);
@@ -198,7 +242,7 @@ function doctor() {
   }
   const m = JSON.parse(readFileSync(MANIFEST, 'utf8'));
   const missing = Object.keys(m.files).filter((f) => !existsSync(f));
-  console.log(`Quimera ${m.version}${m.source ? ` (${m.source})` : ''} · tools: ${m.tools.join(', ')} · kit available: ${VERSION}`);
+  console.log(`Quimera ${m.version}${m.source ? ` (${m.source})` : ''} · tools: ${m.tools.join(', ')} · models: ${m.models ?? 'full'} · kit available: ${VERSION}`);
   console.log(missing.length ? `missing files:\n${missing.map((f) => `  ${f}`).join('\n')}` : 'all kit files present');
   console.log(existsSync('AGENTS.md') ? 'AGENTS.md present' : 'no AGENTS.md yet: run the project-kickoff skill');
   const r = spawnSync('node', ['.quimera/scripts/git-preflight.mjs', '--no-fetch'], { stdio: 'inherit' });
@@ -217,7 +261,7 @@ switch (command) {
     break;
   default:
     console.log(`Quimera ${VERSION}
-  quimera init   [--tools=claude,codex,copilot,cursor] [--mode=discreet|open] [--local-only] [--dry-run]
-  quimera update [--dry-run]
+  quimera init   [--tools=claude,codex,copilot,cursor,antigravity,other] [--mode=discreet|open] [--models=full|economic] [--local-only] [--dry-run]
+  quimera update [--models=full|economic] [--dry-run]
   quimera doctor`);
 }
