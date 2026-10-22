@@ -17,6 +17,7 @@ It is plain Markdown plus a few small Node scripts. Claude Code, Codex, Copilot,
 - **A study round.** Several proposals, from different models or angles, are scored by a separate judge on your criteria.
 - **Continuous, explained architecture review.** It runs at project start, for every new feature, and for anything touching security or the database, with the why in plain words.
 - **Specialist reviewers.** When a change touches security, the database and performance, or the interface and accessibility, a reviewer with that area's checklist joins the review. Changes outside those areas cost nothing extra.
+- **Model profiles for any provider.** Tables for Claude, GPT, Gemini, DeepSeek and MiMo say which model plans, writes and reviews. The economic profile, for limited token budgets, keeps reviews on a mid-size model and gives code to the small one.
 - **Design for the audience.** A few opinionated directions, rendered with real content, before any screen is built.
 - **Project memory any agent can pick up.** A short map, the current state, decisions with their reasons, and your own coding standards, so no agent re-reads the whole repository.
 
@@ -29,6 +30,24 @@ Every task:     task start → (architecture review) → plan → parallel agent
 
 The rules for every step are in [QUIMERA.md](QUIMERA.md). Each step is a skill in [skills/](skills/).
 
+## Start a new project
+
+Put your idea in a file (Markdown, Word or PDF), open your coding agent in an empty folder, attach the file and say:
+
+> Start this project with Quimera (github.com/mnstechbr/Quimera). The idea is in the attached file.
+
+The agent installs the kit, reads your file, asks only what the file leaves open (mode, git identity, models), and reviews the vision and the architecture with you before any code.
+
+### For the agent reading this
+
+If the user asked you to start or set up a project with Quimera:
+
+1. Ask before creating anything: is this folder the project, and should it be a git repository (`git init`)?
+2. Ask which coding tools the user works with here (Claude Code, Codex, Copilot, Cursor, Antigravity; for any other tool use `--tools=other` and follow `adapters/other-tools.md`).
+3. Install the kit with the command in "Install in a project" below, passing those tools. If you cannot run commands, give the user the command to run and wait.
+4. Read `.quimera/QUIMERA.md`, then follow the `project-kickoff` skill from `.agents/skills/project-kickoff/SKILL.md`. If the user attached a vision file, the kickoff reads it first.
+5. Do not write product code until the kickoff, the vision review and the architecture review are done and the user agreed.
+
 ## Install in a project
 
 Quimera is designed for **new projects**. It can be added to an existing one, but the kickoff then only adds files and never reorganizes what is there. Inside the project's git repository:
@@ -37,8 +56,9 @@ Quimera is designed for **new projects**. It can be added to an existing one, bu
 npx github:mnstechbr/Quimera init --tools=claude
 ```
 
-- `--tools`: any of `claude,codex,copilot,cursor` (default `claude`).
+- `--tools`: any of `claude,codex,copilot,cursor,antigravity,other` (default `claude`).
 - `--mode=discreet` installs the commit guard.
+- `--models=economic` sets the Claude Code role agents to the economic profile (default `full`). Switch later with `update --models=…`.
 - `--local-only` keeps the Quimera files and the project memory out of git, on your machine only. Use it in an employer's repository.
 - `--dry-run` shows what would be written.
 

@@ -17,6 +17,7 @@ Na mitologia, a quimera é uma criatura feita de partes de animais diferentes. A
 - **Rodada de estudo.** Várias propostas, de modelos ou ângulos diferentes, recebem nota de um juiz separado pelos seus critérios.
 - **Revisão de arquitetura contínua e explicada.** Roda no começo, a cada função nova e em tudo que toca segurança ou banco de dados, explicando o porquê em palavras simples.
 - **Revisores especialistas.** Quando a mudança mexe com segurança, banco de dados e desempenho, ou interface e acessibilidade, um revisor com o checklist daquela área entra na revisão. Mudança fora dessas áreas não custa nada a mais.
+- **Perfis de modelo para qualquer empresa.** Tabelas para Claude, GPT, Gemini, DeepSeek e MiMo dizem qual modelo planeja, escreve e revisa. O perfil econômico, para quem tem cota limitada de tokens, deixa a revisão num modelo médio e o código no modelo pequeno.
 - **Design para o público.** Poucas direções, com opinião, desenhadas com conteúdo real antes de qualquer tela.
 - **Memória do projeto que qualquer agente retoma.** Um mapa curto, onde paramos, as decisões com o motivo e os seus padrões de código, para nenhum agente precisar reler o projeto inteiro.
 
@@ -29,6 +30,14 @@ Cada tarefa:       início da tarefa → (revisão de arquitetura) → plano →
 
 As regras de cada etapa estão no [QUIMERA.md](QUIMERA.md). Cada etapa é uma skill em [skills/](skills/).
 
+## Começar um projeto novo
+
+Coloque a sua ideia num arquivo (Markdown, Word ou PDF), abra o seu agente numa pasta vazia, anexe o arquivo e diga:
+
+> Comece este projeto com a Quimera (github.com/mnstechbr/Quimera). A ideia está no arquivo anexo.
+
+O agente instala o kit, lê o seu arquivo, pergunta só o que o arquivo não responde (modo, identidade do git, modelos) e revisa com você a visão e a arquitetura antes de qualquer código. Os passos para o agente estão no [README em inglês](README.md#for-the-agent-reading-this).
+
 ## Instalar num projeto
 
 A Quimera foi feita para **projetos novos**. Dá para adicionar num projeto existente, mas aí o kickoff só acrescenta arquivos e nunca reorganiza o que já existe. Dentro do repositório git do projeto:
@@ -37,8 +46,9 @@ A Quimera foi feita para **projetos novos**. Dá para adicionar num projeto exis
 npx github:mnstechbr/Quimera init --tools=claude
 ```
 
-- `--tools`: qualquer combinação de `claude,codex,copilot,cursor` (padrão `claude`).
+- `--tools`: qualquer combinação de `claude,codex,copilot,cursor,antigravity,other` (padrão `claude`).
 - `--mode=discreet` instala a trava dos commits.
+- `--models=economic` deixa os agentes do Claude Code no perfil econômico (padrão `full`). Para trocar depois: `update --models=…`.
 - `--local-only` deixa os arquivos da Quimera e a memória do projeto fora do git, só na sua máquina. Use em repositório da empresa.
 - `--dry-run` mostra o que seria escrito, sem escrever.
 
