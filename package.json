@@ -1,0 +1,27 @@
+{
+  "name": "quimera-kit",
+  "version": "0.1.0",
+  "description": "An AI-agent development standard built from the best parts of proven open-source projects. Works with any tool.",
+  "license": "MIT",
+  "author": "Jean Vitor <mnstechbr@outlook.com>",
+  "type": "module",
+  "bin": {
+    "quimera": "bin/quimera.mjs"
+  },
+  "files": [
+    "bin",
+    "QUIMERA.md",
+    "skills",
+    "scripts",
+    "adapters",
+    "templates",
+    "NOTICE.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mnstechbr/Quimera.git"
+  }
+}
