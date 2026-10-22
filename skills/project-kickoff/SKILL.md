@@ -14,7 +14,8 @@ Read `.quimera/QUIMERA.md` first; this skill fills the "Project profile" it desc
 1. Look before you ask. Run a shell command to check: is this a git repository, which branch, is the working tree clean, are there remotes, what `git config user.name` and `git config user.email` return (local and global). If `node .quimera/scripts/git-preflight.mjs` exists, run it; it is read-only.
 2. List which of these already exist: `AGENTS.md`, a tool-specific instruction file (for example `CLAUDE.md`), `docs/STATE.md`, `docs/MAP.md`, `docs/VISION.md`, `docs/DECISIONS.md`, and any other state or handoff file the project already uses (for example `memory/CURRENT.md`, `docs/CURRENT-HANDOFF.md`). If any exist, follow "Existing project" below as well.
 3. Note what the user already told you in this conversation. Never ask what they already answered.
-4. If the folder is not a git repository, ask before running `git init`.
+4. **If the user brought a vision file** (an idea, a brief, a spec: Markdown, Word, PDF or plain text), read all of it now, before the first question. Convert it to text with the tools already available (for a Word file, a document converter; for a PDF, a text extractor). Do not install anything to read it; if you cannot, ask the user for a Markdown or plain-text copy. Keep the original in `docs/vision/` and note which questions below it already answers. Ask only what it leaves open; for what it answers, show the answer you found and ask the user to confirm it in the same summary.
+5. If the folder is not a git repository, ask before running `git init`.
 
 ## The questions
 
@@ -46,6 +47,12 @@ Ask one at a time. Each question gets: the question, one plain line on why it ma
 **(e) Which language should agents use to talk to you?**
 - Recommend Brazilian Portuguese if that is how the user has been writing. Files, code and commits stay in English regardless (QUIMERA.md, "Language").
 
+**(f) Which models do you use here, and full or economic?**
+- Ask which providers or models the user works with in this project (for example Claude, GPT, Gemini, DeepSeek, MiMo, or a mix such as "Claude plans and reviews, DeepSeek writes the code"), and whether the token budget is limited.
+- Show the mapping from `.quimera/adapters/models.md` for what they named, in both profiles, with the effort for each role.
+- Why it matters: it decides which model plans, writes and reviews, and how much each task costs. Economic keeps every review on the mid-size model and has plans spell out the exact change.
+- Recommend *economic* when the budget is limited (an employer's quota, a small plan), *full* otherwise. If the user names models of their own, record those names; they win over the table.
+
 If the user starts describing the problem or the product at any point, let them talk. Save their words exactly; they go into VISION.md (step 6 below). Do not polish them.
 
 ## Apply the answers
@@ -61,16 +68,18 @@ Summarize all answers in one short message and ask for confirmation. Then:
    - `AGENTS.md`: fill the project profile with the answers; fill name, one-sentence description, stack and commands with what you know; leave `{{…}}` placeholders you cannot fill as `TBD` and list them in STATE.md "Open questions".
    - `docs/STATE.md`: "Now: kickoff done"; next step = the offer below.
    - `docs/MAP.md`: new project → purpose and planned structure only. Existing project → fill it by locating, not by reading everything: search the tree, read the manifest and its scripts (for example `package.json`), the entry points, the config files and the README. Dispatch a subagent (tier: fast) for this if the project is large. Keep MAP under ~120 lines.
-   - `docs/VISION.md`: paste the user's description verbatim under "In the user's words" (redact anything that looks like a secret, a token or a personal document number). Fill "Summary" only with what they said; mark anything you inferred `[ASSUMPTION]`. Leave "Chosen approach" for `study-round`.
+   - `docs/VISION.md`: paste the user's description verbatim under "In the user's words": the text of the vision file when there is one (with a link to the original in `docs/vision/`; if it is longer than about 200 lines, link the original as the record and write a faithful summary instead of the whole text), plus anything they added in the conversation. Redact anything that looks like a secret, a token or a personal document number. Fill "Summary" only with what they said; mark anything you inferred `[ASSUMPTION]`. Leave "Chosen approach" for `study-round`.
    - `docs/DECISIONS.md`: write D-001 (below).
 7. **Tool instruction file.** If a tool-specific file (for example `CLAUDE.md`) exists and does not import or point to `AGENTS.md` (for example a line `@AGENTS.md`), tell the user that tool will not read AGENTS.md, and offer to add the import at the top. Change it only after they agree. On a new project, offer to create the pointer files for the tools they use from `.quimera/templates/`.
+
+8. **Model profile in each tool.** For each tool the user named, read its adapter (`.quimera/adapters/<tool>.md`, "Tiers") and apply the profile the way it says, for example role agents that carry a model. The user already confirmed the profile in the summary; do not ask again, but say what you changed.
 
 ### D-001
 
 ```markdown
 ## D-001 · YYYY-MM-DD · Project kickoff profile
 
-- **Decision:** Mode <discreet|open>; git identity <name> <email>; Quimera files <committed|local-only>; product for <audience>; product languages <…>; conversation in <language>; pushing <ask every time | …>.
+- **Decision:** Mode <discreet|open>; git identity <name> <email>; Quimera files <committed|local-only>; product for <audience>; product languages <…>; conversation in <language>; pushing <ask every time | …>; models <providers> · <full|economic>.
 - **Why:** <one line per choice, in the user's terms, e.g. "employer repository: no agent marks, process files stay local">.
 - **Alternatives rejected:** <the option not chosen for each, and why>.
 - **Decided by:** the user

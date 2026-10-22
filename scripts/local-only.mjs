@@ -20,6 +20,7 @@ const PATHS = [
   '/docs/STATE.md',
   '/docs/MAP.md',
   '/docs/VISION.md',
+  '/docs/vision/',
   '/docs/DECISIONS.md',
   '/docs/DESIGN.md',
   '/docs/EXPERIENCE.md',
