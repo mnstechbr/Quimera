@@ -28,6 +28,8 @@ When this file and the project's `AGENTS.md` disagree, `AGENTS.md` wins: it hold
 - **Mode.** `discreet`: work happens on the user's machine, commits carry only the user's identity, and no AI marks appear in branches, commits or pull requests. `open`: agents may work directly on the remote and AI marks are acceptable.
 - **Identity.** The git name and email for this project. Check them before the first commit of every session (`task-start`), because git identity is per machine and the user works on more than one computer.
 - **Quimera files.** `committed` (kit and memory files live in the repository) or `local-only` (kept on the user's machine through `.git/info/exclude`, never pushed).
+- **Specialist reviewers.** Which specialists `code-review` may add (security, database, interface), or `off`.
+- **Models.** The providers or exact models the user works with, and the model profile, `full` or `economic` (see "Model profile").
 
 ## The flow
 
@@ -81,7 +83,19 @@ Risk raises the level even when the change is small.
 
 - Raise effort to the highest level below "max" (`xhigh` where it exists) only for genuinely complex work. Do not use "max".
 - Do not pick premium model families outside the three tiers unless the user asks.
-- Name the tier explicitly every time you dispatch a subagent. The concrete model names are in `.quimera/adapters/<tool>.md`.
+- Name the tier explicitly every time you dispatch a subagent. Which real model fills each tier, per provider, is in `.quimera/adapters/models.md`; how to call it in your tool is in `.quimera/adapters/<tool>.md`.
+
+### Model profile
+
+The project profile's "Models" line names the providers (or the exact models) the user works with and one of two profiles:
+
+- **Full** (default): the tiers as above.
+- **Economic**, for limited token budgets (for example an employer's quota): the strongest tier is filled by a mid-size model at medium effort, and the standard tier by the small model. `adapters/models.md` has the model for each tier in each profile. Three rules keep it safe:
+  - **Every review uses the strongest tier**, including ordinary reviews that would use standard in the full profile, so the reviewer is never the same small model that wrote the code.
+  - **Plans hand over the exact change** (`writing-plans`), in smaller tasks, because a small model implementing from prose redoes more work than it saves.
+  - **Going up costs the user's ok.** Effort stays at medium or below. When the failure budget, a Risky change or a skill that asks for high effort calls for more than the profile gives, tell the user in one line and ask before using a stronger model or effort. If they decline, run it with the profile's strongest tier and say so in the report.
+- **Providers with only two sizes** (DeepSeek, MiMo): the large model plans and does every review, the small one writes code and searches, in both profiles. Never let the small model review its own code.
+- Whenever a skill or a brief names a tier, read it through the project's profile. Applying the profile to a tool (for example the model fields of role agents) is described in that tool's adapter.
 
 ## Project memory
 
@@ -113,7 +127,7 @@ Risk raises the level even when the change is small.
 - Run the full suite and the build once before the push, not after every edit.
 - Documentation-only changes need no code checks.
 - Always run checks in the foreground, wait for them, and read the result.
-- Failure budget, the same everywhere: after two failed attempts at the same failure, stop patching and rethink with `systematic-debugging` (a fresh look, or one tier up). After a third, stop and bring it to the user with what was tried.
+- Failure budget, the same everywhere: after two failed attempts at the same failure, stop patching and rethink with `systematic-debugging` (a fresh look, or one tier up; in the economic profile, ask the user first). After a third, stop and bring it to the user with what was tried.
 
 ## After the approach is agreed: stop and ask only when
 
@@ -134,4 +148,4 @@ Otherwise continue, and record the choice you made. This list never replaces pri
 
 ## Tool adapters
 
-`.quimera/adapters/` maps the actions named in the skills ("ask the user", "dispatch a subagent", "track progress") to each tool's real features, and lists the model names for each tier. Read the file for the tool you are running in.
+`.quimera/adapters/` maps the actions named in the skills ("ask the user", "dispatch a subagent", "track progress") to each tool's real features: `claude-code.md`, `codex.md`, `copilot.md`, `antigravity.md`, `other-tools.md`. Read the file for the tool you are running in. `models.md` lists the real model for each tier, per provider and model profile.

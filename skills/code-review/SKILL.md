@@ -16,7 +16,7 @@ Two parts: **Requesting** a review from a fresh reviewer, and **Receiving** the 
 | Depth (see QUIMERA.md) | Review |
 |---|---|
 | Trivial, Small | Not required. |
-| Normal | Before the push. Reviewer tier: standard (specialists: see "Specialist reviewers"). |
+| Normal | Before the push. Reviewer tier: standard; strongest in the economic model profile (specialists: see "Specialist reviewers"). |
 | Risky | Before the push, and after each risky part if the work is long. Reviewer tier: strongest, for the lead reviewer too (see "Specialist reviewers"). |
 
 Also useful: after fixing a hard bug, before a large refactor (baseline), or when stuck.
@@ -31,7 +31,7 @@ Also useful: after fixing a hard bug, before a large refactor (baseline), or whe
    - **Rules:** `AGENTS.md`, `.quimera/QUIMERA.md`, and the standards from `docs/standards/INDEX.md` that match the touched files.
    - **Verification already run:** command → result.
    - **Focus:** anything you are unsure of, and whether the change is Risky.
-4. **Choose the reviewers** with "Specialist reviewers" below, then **dispatch each one as a fresh subagent** with `references/reviewer-brief.md` filled in (plus the specialist block, for a specialist). Several reviewers go out together, in the same turn. Tier: as "Specialist reviewers" says; for the general reviewer, strongest for Risky depth, standard otherwise. A reviewer reads only; it never edits files, never moves HEAD, and does not dispatch reviewers of its own.
+4. **Choose the reviewers** with "Specialist reviewers" below, then **dispatch each one as a fresh subagent** with `references/reviewer-brief.md` filled in (plus the specialist block, for a specialist). Several reviewers go out together, in the same turn. Tier: as "Specialist reviewers" says; for the general reviewer, strongest for Risky depth or the economic model profile, standard otherwise. A reviewer reads only; it never edits files, never moves HEAD, and does not dispatch reviewers of its own.
 5. **If the tool cannot dispatch subagents,** give the user each filled brief (one per reviewer, lead first) to run in a separate session (ideally another tool or model) and wait for the findings. A self-review in the same session is not independent; if you do one, label it that way.
 6. **Act on the findings** with Part 2.
 
@@ -53,7 +53,7 @@ How to choose:
 4. **No enabled area touched:** one general reviewer, as before.
 5. **One enabled area:** that specialist replaces the general reviewer. It is the **lead**: it also goes through the seven general lenses for the whole diff.
 6. **Two or three enabled areas:** one specialist per area, in parallel. The one whose area holds most of the diff is the lead; the others only answer their own block. Fill `[ROLE]` in each brief accordingly.
-7. **Tier of the lead:** the higher of its table tier and the depth tier. At Risky depth the lead is always strongest, even the interface specialist.
+7. **Tier of the lead:** the higher of its table tier and the depth tier. At Risky depth the lead is always strongest, even the interface specialist. In the economic model profile, every reviewer, specialist or general, uses the strongest tier (the mid-size model, QUIMERA.md "Model profile").
 8. **Overlaps:** a cache keyed without the user or tenant belongs to the database block; the security reviewer skips it. Any other finding reported by two reviewers counts once.
 
 When you report, say which reviewers ran and why, and for each one how many findings you accepted and declined. If a specialist keeps returning nothing useful on a project over several tasks, tell the user and suggest turning it off in the profile.

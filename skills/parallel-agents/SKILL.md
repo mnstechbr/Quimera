@@ -27,7 +27,7 @@ Use it for a plan with several tasks, especially `[P]` tasks, or for several ind
 | Task review of a small mechanical diff | standard |
 | Task review of risky code, final review, hard problems, fix round after two failures | strongest |
 
-Effort follows `QUIMERA.md`: low for fast, medium for standard, high for strongest; the highest level below "max" only for genuinely complex work. Turn count beats token price: the cheapest models often take two or three times the turns on multi-step work, so use standard as the floor for implementers working from prose and for reviewers. Fast suits a task whose plan text already contains the exact change.
+Effort follows `QUIMERA.md`: low for fast, medium for standard, high for strongest; the highest level below "max" only for genuinely complex work. Turn count beats token price: the cheapest models often take two or three times the turns on multi-step work, so use standard as the floor for implementers working from prose and for reviewers. Fast suits a task whose plan text already contains the exact change. In the economic model profile, tiers resolve as QUIMERA.md "Model profile" says: every review uses the strongest tier, and a round-3 fix one tier up needs the user's ok.
 
 ## Setup
 

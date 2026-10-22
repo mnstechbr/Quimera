@@ -106,7 +106,9 @@ A step is done when the implementer can write exactly one reasonable thing from 
 - A verification step: the command and what passing looks like.
 - A reference to another task: point to its Interfaces block; do not repeat its code.
 
-Lines that decide nothing ("handle edge cases", "add validation", "TBD", a type no task defines) are gaps. Function bodies the signature and tests already determine are transcripts. Both are defects.
+**Economic model profile** (QUIMERA.md, "Model profile"): the implementer is the small model, so go one step further. Keep each task to one or two files, write the body for any logic beyond a direct call or a mapping, and name the existing function or file to copy the pattern from.
+
+Lines that decide nothing ("handle edge cases", "add validation", "TBD", a type no task defines) are gaps. Function bodies the signature and tests already determine are transcripts. Both are defects, except that in the economic profile transcripts are allowed (above); gaps never are.
 
 ## Self-review
 

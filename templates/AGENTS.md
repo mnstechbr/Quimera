@@ -10,6 +10,7 @@
 - **User's language:** {{Brazilian Portuguese}}
 - **Pushing:** {{ask every time | allowed without asking — date and scope}}
 - **Specialist reviewers:** {{security, database, interface | off}}
+- **Models:** {{providers or exact models, e.g. Anthropic}} · {{full | economic}} (tiers per `.quimera/adapters/models.md`)
 
 ## Process
 

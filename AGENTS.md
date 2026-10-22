@@ -10,6 +10,7 @@ This repository is the Quimera kit, not a project that uses it. Agents working h
 - **User's language:** Brazilian Portuguese
 - **Pushing:** ask every time
 - **Specialist reviewers:** security
+- **Models:** Anthropic · full
 
 ## Layout
 
