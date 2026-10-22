@@ -6,7 +6,7 @@ How the actions named in Quimera skills map to Claude Code. Verified against the
 
 - **Instructions:** Claude Code reads `AGENTS.md` only when the project has no `CLAUDE.md`. If a `CLAUDE.md` exists, it must contain the line `@AGENTS.md`, or `AGENTS.md` is ignored. The installer writes a `CLAUDE.md` with that import.
 - **Skills:** `.claude/skills/<name>/SKILL.md`. The installer mirrors `.agents/skills/` there.
-- **Subagents:** `.claude/agents/*.md`. The installer adds three role agents (below).
+- **Subagents:** `.claude/agents/*.md`. The installer adds six role agents (below).
 - **Cloud sessions** (claude.ai/code) load everything committed in the repository (`AGENTS.md`, `CLAUDE.md`, `.claude/skills`, `.claude/agents`, `.claude/settings.json` hooks). They do **not** load your `~/.claude` folder, and they do not install plugins listed in the repository's settings. In local-only mode the Quimera files are not committed, so cloud sessions will not see them: work locally.
 
 ## Actions
@@ -37,6 +37,11 @@ How the actions named in Quimera skills map to Claude Code. Verified against the
 | `quimera-explorer` | haiku · low | Search, read and report. Read-only. |
 | `quimera-implementer` | sonnet · medium | A well-defined part of a plan, with its own files |
 | `quimera-reviewer` | opus · high | Independent review, architecture and adversarial passes. Read-only. |
+| `quimera-security-reviewer` | opus · high | Specialist review: security. Read-only. |
+| `quimera-database-reviewer` | opus · high | Specialist review: database and performance. Read-only. |
+| `quimera-interface-reviewer` | sonnet · medium | Specialist review: interface and accessibility. Read-only. |
+
+`code-review` decides which reviewers run (its "Specialist reviewers" table). For a general review at Normal depth, pass `model: sonnet` to `quimera-reviewer`; for Risky depth keep its default. At Risky depth, when `quimera-interface-reviewer` is the lead, pass `model: opus`.
 
 ## Discreet mode
 

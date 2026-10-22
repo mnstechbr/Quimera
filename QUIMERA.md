@@ -53,7 +53,7 @@ When this file and the project's `AGENTS.md` disagree, `AGENTS.md` wins: it hold
 | Debug | `systematic-debugging` | Something fails and the cause is not obvious |
 | Verify | `verification` | Before any claim that something works |
 | Docs and code agree | `consistency-check` | When the work was planned from a vision, spec or plan |
-| Independent review | `code-review` | Before the push, for anything beyond a small change |
+| Independent review | `code-review` | Before the push, for anything beyond a small change; specialists for security, database and performance, and interface and accessibility join when the diff touches their area |
 | Memory, commits, push | `close-task` | Always |
 
 **When a new skill seems needed:** `writing-skills`.
@@ -76,6 +76,8 @@ Risk raises the level even when the change is small.
 | Search, read, locate, summarize, run verbose commands and report | fast | low |
 | Implement a well-defined part, write tests | standard | medium |
 | Plan, architecture, security, hard bugs, review of risky work | strongest | high |
+| Specialist review: security, database and performance | strongest | high |
+| Specialist review: interface and accessibility | standard | medium |
 
 - Raise effort to the highest level below "max" (`xhigh` where it exists) only for genuinely complex work. Do not use "max".
 - Do not pick premium model families outside the three tiers unless the user asks.

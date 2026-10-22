@@ -9,6 +9,7 @@ This repository is the Quimera kit, not a project that uses it. Agents working h
 - **Quimera files:** committed
 - **User's language:** Brazilian Portuguese
 - **Pushing:** ask every time
+- **Specialist reviewers:** security
 
 ## Layout
 

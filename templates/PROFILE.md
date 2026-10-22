@@ -7,3 +7,4 @@
 - **Quimera files:** local-only
 - **User's language:** {{Brazilian Portuguese}}
 - **Pushing:** {{ask every time | allowed without asking — date and scope}}
+- **Specialist reviewers:** {{security, database, interface | off}}

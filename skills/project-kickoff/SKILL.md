@@ -46,7 +46,7 @@ Ask one at a time. Each question gets: the question, one plain line on why it ma
 **(e) Which language should agents use to talk to you?**
 - Recommend Brazilian Portuguese if that is how the user has been writing. Files, code and commits stay in English regardless (QUIMERA.md, "Language").
 
-If the user starts describing the problem or the product at any point, let them talk. Save their words exactly; they go into VISION.md (step 5 below). Do not polish them.
+If the user starts describing the problem or the product at any point, let them talk. Save their words exactly; they go into VISION.md (step 6 below). Do not polish them.
 
 ## Apply the answers
 
@@ -54,15 +54,16 @@ Summarize all answers in one short message and ask for confirmation. Then:
 
 1. **Git identity.** Run `git config --local user.name "<name>"` and `git config --local user.email "<email>"`. Local scope only; never touch the global config. Read the values back to confirm.
 2. **Pushing.** Record "ask every time" in the profile unless the user has already given a standing permission (then record its date and scope).
-3. **Discreet mode.** Run `node .quimera/scripts/install-hooks.mjs`. It installs the `commit-msg` guard into this repository's hooks folder (local only, never committed). If it reports a different `commit-msg` hook already there, tell the user and do not overwrite it.
-4. **Local-only.** Run `node .quimera/scripts/local-only.mjs`. It appends the Quimera and memory paths to `.git/info/exclude` and lists any of them git already tracks. Then run `git status --short` and confirm none of them appear. Exclude does not hide files git already tracks: if any are listed, say so and ask (see "Existing project").
-5. **Memory files.** Create from `.quimera/templates/`:
+3. **Specialist reviewers.** Record "security, database, interface" in the profile (wherever the profile lives: `AGENTS.md` or `.quimera/PROFILE.md`), dropping `interface` when the project has no user interface and `database` when it has no database. Mention it in the summary; the user can turn any of them off later.
+4. **Discreet mode.** Run `node .quimera/scripts/install-hooks.mjs`. It installs the `commit-msg` guard into this repository's hooks folder (local only, never committed). If it reports a different `commit-msg` hook already there, tell the user and do not overwrite it.
+5. **Local-only.** Run `node .quimera/scripts/local-only.mjs`. It appends the Quimera and memory paths to `.git/info/exclude` and lists any of them git already tracks. Then run `git status --short` and confirm none of them appear. Exclude does not hide files git already tracks: if any are listed, say so and ask (see "Existing project").
+6. **Memory files.** Create from `.quimera/templates/`:
    - `AGENTS.md`: fill the project profile with the answers; fill name, one-sentence description, stack and commands with what you know; leave `{{…}}` placeholders you cannot fill as `TBD` and list them in STATE.md "Open questions".
    - `docs/STATE.md`: "Now: kickoff done"; next step = the offer below.
    - `docs/MAP.md`: new project → purpose and planned structure only. Existing project → fill it by locating, not by reading everything: search the tree, read the manifest and its scripts (for example `package.json`), the entry points, the config files and the README. Dispatch a subagent (tier: fast) for this if the project is large. Keep MAP under ~120 lines.
    - `docs/VISION.md`: paste the user's description verbatim under "In the user's words" (redact anything that looks like a secret, a token or a personal document number). Fill "Summary" only with what they said; mark anything you inferred `[ASSUMPTION]`. Leave "Chosen approach" for `study-round`.
    - `docs/DECISIONS.md`: write D-001 (below).
-6. **Tool instruction file.** If a tool-specific file (for example `CLAUDE.md`) exists and does not import or point to `AGENTS.md` (for example a line `@AGENTS.md`), tell the user that tool will not read AGENTS.md, and offer to add the import at the top. Change it only after they agree. On a new project, offer to create the pointer files for the tools they use from `.quimera/templates/`.
+7. **Tool instruction file.** If a tool-specific file (for example `CLAUDE.md`) exists and does not import or point to `AGENTS.md` (for example a line `@AGENTS.md`), tell the user that tool will not read AGENTS.md, and offer to add the import at the top. Change it only after they agree. On a new project, offer to create the pointer files for the tools they use from `.quimera/templates/`.
 
 ### D-001
 

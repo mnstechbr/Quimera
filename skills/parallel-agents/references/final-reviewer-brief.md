@@ -1,6 +1,6 @@
 # Final reviewer brief
 
-Use once, after every task is complete, for the whole branch. Tier: strongest, high effort. Save the filled brief to scratch and dispatch with its path. In the inline fallback, run this checklist yourself.
+Use once, after every task is complete, for the whole branch. Tier per the `code-review` depth table: standard for normal depth, strongest for risky. Save the filled brief to scratch and dispatch with its path. In the inline fallback, run this checklist yourself.
 
 ```markdown
 # Final review of branch [branch-name]
@@ -18,6 +18,9 @@ spec needs that no task covered, and what will hurt a real user.
 - Whole-branch diff and commit list: [PACKAGE_PATH]
 - Project rules: `AGENTS.md` (non-negotiable rules) and the standards that
   match the changed files: [STANDARD_PATHS]
+- Specialist reviewers running alongside you: [SPECIALISTS or "none"].
+  They answer only their own checklists; you are the lead and cover the
+  whole branch with every lens.
 
 ## Rules
 - Read-only. Do not modify files, the index, HEAD or branches. To inspect
