@@ -16,8 +16,8 @@ Two parts: **Requesting** a review from a fresh reviewer, and **Receiving** the 
 | Depth (see QUIMERA.md) | Review |
 |---|---|
 | Trivial, Small | Not required. |
-| Normal | Before the push. Reviewer tier: standard. |
-| Risky | Before the push, and after each risky part if the work is long. Reviewer tier: strongest. |
+| Normal | Before the push. Reviewer tier: standard (specialists: see "Specialist reviewers"). |
+| Risky | Before the push, and after each risky part if the work is long. Reviewer tier: strongest, for the lead reviewer too (see "Specialist reviewers"). |
 
 Also useful: after fixing a hard bug, before a large refactor (baseline), or when stuck.
 
@@ -31,9 +31,32 @@ Also useful: after fixing a hard bug, before a large refactor (baseline), or whe
    - **Rules:** `AGENTS.md`, `.quimera/QUIMERA.md`, and the standards from `docs/standards/INDEX.md` that match the touched files.
    - **Verification already run:** command → result.
    - **Focus:** anything you are unsure of, and whether the change is Risky.
-4. **Dispatch one fresh subagent** with `references/reviewer-brief.md` filled in. Tier: strongest for Risky depth, standard otherwise. The reviewer reads only; it never edits files, never moves HEAD, and does not dispatch reviewers of its own.
-5. **If the tool cannot dispatch subagents,** give the user the filled brief to run in a separate session (ideally another tool or model) and wait for the findings. A self-review in the same session is not independent; if you do one, label it that way.
+4. **Choose the reviewers** with "Specialist reviewers" below, then **dispatch each one as a fresh subagent** with `references/reviewer-brief.md` filled in (plus the specialist block, for a specialist). Several reviewers go out together, in the same turn. Tier: as "Specialist reviewers" says; for the general reviewer, strongest for Risky depth, standard otherwise. A reviewer reads only; it never edits files, never moves HEAD, and does not dispatch reviewers of its own.
+5. **If the tool cannot dispatch subagents,** give the user each filled brief (one per reviewer, lead first) to run in a separate session (ideally another tool or model) and wait for the findings. A self-review in the same session is not independent; if you do one, label it that way.
 6. **Act on the findings** with Part 2.
+
+### Specialist reviewers
+
+A specialist is the same read-only reviewer with one extra block in its brief: a checklist for one area. It catches what a general pass skims over. With one area touched it replaces the general reviewer, so it costs nothing extra; each further area adds one subagent.
+
+| Specialist | Runs when the diff touches | Block | Tier |
+|---|---|---|---|
+| Security | sign-in, sessions, roles, permissions, tokens, cookies, secrets, encryption; anything that receives outside input (forms, uploads, imports, webhooks, model output, agent tools); user or tenant isolation; security headers, CORS; a new dependency | `references/specialists/security.md` | strongest |
+| Database and performance | migrations, schema or models, queries or ORM calls, indexes, transactions and locks, row-level security or grants, caching, background jobs, loops that call the database or the network, lists that grow | `references/specialists/database-performance.md` | strongest |
+| Interface and accessibility | pages, components, styles and tokens, text shown to users, forms, navigation, animation, end-to-end interface tests | `references/specialists/interface-accessibility.md` | standard |
+
+How to choose:
+
+1. **Only at Normal or Risky depth.** Trivial and Small changes get no specialist.
+2. **Enabled specialists first.** The project profile's "Specialist reviewers" line lists the enabled ones; "off" means none. No line (projects set up before it existed) means all three. Only enabled areas count in the steps below.
+3. **Decide from the diff, not the task title.** Read `git diff --stat BASE..HEAD` and search the diff for the signals above. A one-line copy change in a component is still Small; a "small" change to a query used on every page is not.
+4. **No enabled area touched:** one general reviewer, as before.
+5. **One enabled area:** that specialist replaces the general reviewer. It is the **lead**: it also goes through the seven general lenses for the whole diff.
+6. **Two or three enabled areas:** one specialist per area, in parallel. The one whose area holds most of the diff is the lead; the others only answer their own block. Fill `[ROLE]` in each brief accordingly.
+7. **Tier of the lead:** the higher of its table tier and the depth tier. At Risky depth the lead is always strongest, even the interface specialist.
+8. **Overlaps:** a cache keyed without the user or tenant belongs to the database block; the security reviewer skips it. Any other finding reported by two reviewers counts once.
+
+When you report, say which reviewers ran and why, and for each one how many findings you accepted and declined. If a specialist keeps returning nothing useful on a project over several tasks, tell the user and suggest turning it off in the profile.
 
 ### What the reviewer looks at (lenses)
 
@@ -82,7 +105,7 @@ Applies to findings from the reviewer subagent, the user, a teammate or a pull r
 1. Clarify everything unclear.
 2. Fix Critical and blocking points (breakage, security).
 3. Then simple fixes, then complex ones.
-4. Check each fix as you go; when done, run `verification` again on the result. For Critical fixes on Risky work, send the fix range back to a fresh reviewer.
+4. Check each fix as you go; when done, run `verification` again on the result. For Critical fixes on Risky work, send the fix range back to a fresh reviewer of the same kind: a specialist's finding goes back to that specialist's block.
 5. Rule on every "Declined to judge" line: in scope (treat as a finding) or out of scope (say why).
 
 ### Push back when
@@ -100,7 +123,7 @@ State the fix, not your feelings: "Fixed: the export now checks ownership (order
 
 ### Report
 
-Tell the user, in their language and in plain words: what the review found (by severity), what you fixed, what you declined and why, and the verification after the fixes. On a pull request, reply in the thread of each comment, not in one top-level comment.
+Tell the user, in their language and in plain words: which reviewers ran, what the review found (by severity), what you fixed, what you declined and why, and the verification after the fixes. On a pull request, reply in the thread of each comment, not in one top-level comment.
 
 ## Common mistakes
 
@@ -112,4 +135,4 @@ Tell the user, in their language and in plain words: what the review found (by s
 
 ## Provenance
 
-Adapted from `skills/requesting-code-review/` (SKILL.md, code-reviewer.md) and `skills/receiving-code-review/SKILL.md` in [obra/superpowers](https://github.com/obra/superpowers), commit 2ce8aa1, © 2025 Jesse Vincent, MIT License; review lenses and finding shape adapted from `skills/bmad-review/references/lens-edge-case-hunter.md`, `lens-verification-gap.md` and the lens list in `skills/bmad-code-review/customize.toml` of BMAD-METHOD by BMad Code, LLC (MIT), commit 61e01f8. Changed: merged requesting and receiving into one skill, tied reviewer tier to Quimera depth, added security, weakened-protection and rule lenses, removed harness tool names and most forge-specific reply details.
+Adapted from `skills/requesting-code-review/` (SKILL.md, code-reviewer.md) and `skills/receiving-code-review/SKILL.md` in [obra/superpowers](https://github.com/obra/superpowers), commit 2ce8aa1, © 2025 Jesse Vincent, MIT License; review lenses and finding shape adapted from `skills/bmad-review/references/lens-edge-case-hunter.md`, `lens-verification-gap.md` and the lens list in `skills/bmad-code-review/customize.toml` of BMAD-METHOD by BMad Code, LLC (MIT), commit 61e01f8. Changed: merged requesting and receiving into one skill, tied reviewer tier to Quimera depth, added security, weakened-protection and rule lenses, removed harness tool names and most forge-specific reply details. The specialist reviewers and their routing are original to Quimera; each block in `references/specialists/` names its own sources.

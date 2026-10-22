@@ -1,6 +1,8 @@
 # Reviewer brief
 
-Fill the placeholders and send everything inside the block to a fresh subagent (tier: strongest for Risky depth, standard otherwise). Do not add your session history. Paths are enough: the reviewer reads the files itself.
+Fill the placeholders and send everything inside the block to a fresh subagent (tier: strongest for Risky depth, standard otherwise; a specialist uses the tier in the routing table of `../SKILL.md`). Do not add your session history. Paths are enough: the reviewer reads the files itself.
+
+For a specialist, paste its block from `specialists/` where the brief says `[SPECIALIST_BLOCK]`, fill any placeholder inside the block (the interface block has `[SCREENSHOT_PATHS]`), and keep one of the two `[ROLE]` sentences. For the general reviewer, delete the `[ROLE …]` paragraph and the `[SPECIALIST_BLOCK]` line.
 
 ```
 You are reviewing a code change you did not write. Your job is to find
@@ -32,6 +34,12 @@ them.
 ## Focus
 [FOCUS — areas the author is unsure about; "Risky: <why>" if applicable]
 
+[ROLE — "You are the lead: also go through the seven lenses below for the
+whole diff." or "Answer only your specialist block; another reviewer covers
+the seven lenses."]
+
+[SPECIALIST_BLOCK]
+
 ## Ground rules
 - Read only. Do not edit files, do not change the working tree, the
   index, HEAD or branches. If you need another revision, read it with
@@ -53,7 +61,7 @@ For behavior the requirements do not mention, judge by what a
 reasonable user of this software would expect. Silence is not
 permission.
 
-## Lenses — go through each one
+## Lenses — go through each one (unless your role says otherwise)
 1. Defects: logic errors, wrong results, broken error paths, unmet
    requirements, deviations from the plan (say if a deviation looks
    intentional or if the plan itself is wrong).
@@ -95,7 +103,7 @@ Specific things done well (file:line).
 ### Findings
 Grouped by severity. For each:
 - Location: file:line
-- Lens: which of the seven
+- Lens: which of the seven, or the specialist question (e.g. "specialist security Q4")
 - Trigger condition: when it goes wrong
 - Consequence: what goes wrong, and for whom
 - Suggested guard: the fix, or the test to add
@@ -108,7 +116,8 @@ line. Write "None" if you set nothing aside.
 
 ### Verdict
 Ready / Ready with fixes / Not ready — plus one or two sentences of
-technical reasoning.
+technical reasoning. If you answer only a specialist block, your
+strengths and verdict cover your area only; say so.
 
 Be specific (file:line, not "improve error handling"). Do not comment
 on code you did not read. Do not say "looks good" without checking.
