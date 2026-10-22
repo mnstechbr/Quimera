@@ -1,6 +1,6 @@
 # Notice and credits
 
-Quimera adapts parts of the open-source projects below. Each skill ends with a **Provenance** section naming the exact upstream files it adapts and what was changed. All four code sources are MIT-licensed; their copyright notices and the MIT permission notice are reproduced here as that license requires.
+Quimera adapts parts of the open-source projects below. Each skill ends with a **Provenance** section naming the exact upstream files it adapts and what was changed. All six code sources are MIT-licensed; their copyright notices and the MIT permission notice are reproduced here as that license requires.
 
 | Project | Copyright | Version read | What Quimera adapts |
 |---|---|---|---|
@@ -8,13 +8,15 @@ Quimera adapts parts of the open-source projects below. Each skill ends with a *
 | [github/spec-kit](https://github.com/github/spec-kit) | Copyright GitHub, Inc. | 1.2.4.dev0, commit `27d14e2` | Assess (idea funnel and scorecard), clarify (one question at a time, dated answers), constitution (versioned principles), plan gates and complexity tracking, task format, analyze and converge (consistency checks), per-tool skill folder locations |
 | [bmad-code-org/BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) | Copyright (c) 2025 BMad Code, LLC | 6.13.0-next, commit `61e01f8`, and the V4 branch | Architecture decisions and adversarial review gate, architect checklist (security and data sections), scale-adaptive routing, review lenses, product brief coaching and PRD rubric, design directions and the DESIGN / EXPERIENCE split |
 | [buildermethods/agent-os](https://github.com/buildermethods/agent-os) | Copyright (c) 2025 CasJam Media LLC (Builder Methods) | 3.0, commit `e892e61` | Discovering, indexing and injecting the user's own coding standards |
+| [wshobson/agents](https://github.com/wshobson/agents) | Copyright (c) 2024 Seth Hobson | commit `0874a27` | Threat-modeling approach for the security reviewer, PostgreSQL schema rules for the database reviewer, WCAG impact grouping for the interface reviewer |
+| [VoltAgent/awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) | Copyright (c) 2025 VoltAgent | commit `408d3c9` | Accessibility checklists for the interface reviewer |
 
 **Ideas, not code:**
 
 - The project memory files follow the spirit of the [Cline Memory Bank](https://docs.cline.bot/best-practices/memory-bank) pattern (brief, product context, active context, system patterns, tech context, progress), merged into four files.
 - `AGENTS.md` is the open format described at [agents.md](https://agents.md).
 
-**Trademarks.** "BMad", "BMad Method", "BMAD-METHOD" and "BMad Core" are trademarks of BMad Code, LLC and are not covered by the MIT license. Quimera is inspired in part by BMAD-METHOD, is not affiliated with or endorsed by BMad Code, LLC, and does not use those names for any of its parts. Superpowers, Spec Kit and Agent OS are named only to credit their authors.
+**Trademarks.** "BMad", "BMad Method", "BMAD-METHOD" and "BMad Core" are trademarks of BMad Code, LLC and are not covered by the MIT license. Quimera is inspired in part by BMAD-METHOD, is not affiliated with or endorsed by BMad Code, LLC, and does not use those names for any of its parts. Superpowers, Spec Kit, Agent OS, wshobson/agents and VoltAgent are named only to credit their authors.
 
 ## MIT permission notice (applies to each copyright above)
 

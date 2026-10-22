@@ -16,6 +16,7 @@ Na mitologia, a quimera é uma criatura feita de partes de animais diferentes. A
 - **Verificação só do que mudou.** Lint, tipos e os testes ligados às mudanças durante o trabalho; a suíte completa e o build uma vez antes do push.
 - **Rodada de estudo.** Várias propostas, de modelos ou ângulos diferentes, recebem nota de um juiz separado pelos seus critérios.
 - **Revisão de arquitetura contínua e explicada.** Roda no começo, a cada função nova e em tudo que toca segurança ou banco de dados, explicando o porquê em palavras simples.
+- **Revisores especialistas.** Quando a mudança mexe com segurança, banco de dados e desempenho, ou interface e acessibilidade, um revisor com o checklist daquela área entra na revisão. Mudança fora dessas áreas não custa nada a mais.
 - **Design para o público.** Poucas direções, com opinião, desenhadas com conteúdo real antes de qualquer tela.
 - **Memória do projeto que qualquer agente retoma.** Um mapa curto, onde paramos, as decisões com o motivo e os seus padrões de código, para nenhum agente precisar reler o projeto inteiro.
 

@@ -16,6 +16,7 @@ It is plain Markdown plus a few small Node scripts. Claude Code, Codex, Copilot,
 - **Verify only what changed.** Lint, type checks and the tests connected to your changes while you work; the full suite and the build once before the push.
 - **A study round.** Several proposals, from different models or angles, are scored by a separate judge on your criteria.
 - **Continuous, explained architecture review.** It runs at project start, for every new feature, and for anything touching security or the database, with the why in plain words.
+- **Specialist reviewers.** When a change touches security, the database and performance, or the interface and accessibility, a reviewer with that area's checklist joins the review. Changes outside those areas cost nothing extra.
 - **Design for the audience.** A few opinionated directions, rendered with real content, before any screen is built.
 - **Project memory any agent can pick up.** A short map, the current state, decisions with their reasons, and your own coding standards, so no agent re-reads the whole repository.
 
