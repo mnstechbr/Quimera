@@ -8,6 +8,7 @@ Quimera is plain Markdown, so any agent that can read files can follow it.
 | Tool | Instruction file | Skills folder |
 |---|---|---|
 | Cursor | reads `AGENTS.md` | `.cursor/skills/` |
+| Google Antigravity | reads `AGENTS.md` (1.20.5+); see `antigravity.md` | `.agents/skills/` |
 | Gemini CLI | `GEMINI.md`: add `@AGENTS.md` | none: the agent reads `.agents/skills/` when the flow names a skill |
 | OpenCode, Hermes, others | `AGENTS.md` | the tool's own skills folder, or `.agents/skills/` |
 
@@ -15,7 +16,7 @@ Folder locations taken from GitHub Spec Kit's integrations. Confirm them in your
 
 ## Tiers
 
-Map fast / standard / strongest to the models the tool offers, and keep the effort ceiling in `QUIMERA.md`.
+Use the table in `models.md` for the provider the tool runs, in the project's model profile (full or economic), and keep the effort ceiling in `QUIMERA.md`.
 
 ## Without subagents
 

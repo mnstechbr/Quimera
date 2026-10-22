@@ -18,7 +18,7 @@ How Quimera works with GitHub Copilot (agent mode, coding agent and CLI).
 
 ## Tiers
 
-Pick from the models your Copilot plan offers: a small fast model for **fast**, the default for **standard**, the strongest available for **strongest**.
+Copilot offers models from several providers. Use the table in `models.md` for the provider you pick, in the project's model profile (full or economic). If your plan does not offer a listed model, use the closest one of the same size and tell the user.
 
 ## Discreet mode
 

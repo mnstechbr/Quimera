@@ -18,9 +18,9 @@ How the actions named in Quimera skills map to OpenAI Codex (CLI and app).
 
 ## Tiers
 
-Map the three tiers to the models your Codex install offers: a small fast model for **fast**, the default coding model for **standard**, the strongest reasoning model for **strongest**. Use Codex's reasoning-effort setting with the same ceiling as Quimera: high for the strongest tier, the level just below the maximum only for very complex work, never the maximum.
+Use the OpenAI table in `models.md`, in the project's model profile: full is GPT-6.1 Sol high / GPT-6.1 Sol medium / GPT-6 Luna low; economic is GPT-6.1 Sol medium / GPT-6 Luna medium / GPT-6 Luna low. Set Codex's reasoning-effort setting to match, never the maximum. If the project uses models of another provider through Codex, use that provider's table.
 
-Model names change often. Write the current mapping in the project's `AGENTS.md` if you want it fixed.
+Model names change often. The profile's "Models" line wins: write the exact names there if you want them fixed.
 
 ## Discreet mode
 
