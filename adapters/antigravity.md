@@ -21,6 +21,10 @@ How the actions named in Quimera skills map to Google Antigravity (IDE and CLI).
 
 Use the table in `models.md` for the provider you run (usually Google Gemini), in the project's model profile (full or economic). Never use the maximum thinking level.
 
+### Session model
+
+Pick the model in the agent panel: the strongest tier while planning and reviewing, the standard tier while building. Switch when the plan is approved, not in the middle of a task.
+
 ## Discreet mode
 
 Install the commit-msg guard (`node .quimera/scripts/install-hooks.mjs`). Check the git identity Antigravity commits with before the first commit (`node .quimera/scripts/git-preflight.mjs`).

@@ -20,3 +20,13 @@ One next action for each situation the pilots showed going wrong, and where the 
 | A game (or any other product type) at project start | Run `vision-review` with the core categories and that type's set | `vision-review`; `references/categories.md` |
 | Another workflow skill pack or plugin is installed | Follow `AGENTS.md`, then `QUIMERA.md`, and tell the owner once which workflow you follow | `QUIMERA.md` "Other skills and plugins" |
 | Design directions for a game or a visual showcase | Start from the owner's references and real assets, never placeholder art | `design-directions` step 1 |
+| A read-only review or question ("look at this", "what do you think?") | Answer it; no branch, no commit, no files changed | `task-start` (it starts changes only) |
+| A typo or a one-line fix | Trivial depth: branch, change, verify, commit | `QUIMERA.md` "Depth" |
+| A two-line change to a permission check | Risky depth: `architecture-review` first, the plan approved, `code-review` on the strongest tier | `QUIMERA.md` "Depth" |
+| Third failed attempt at the same failure, or a blocking review finding after round 3 | Stop the dependent work and bring it to the user with what was tried | `QUIMERA.md` "Verification"; `parallel-agents` step 6 |
+| No independent reviewer available | Give the user the review brief to run in another session; label any review of your own as self-review (not independent) | `code-review`; `parallel-agents` "Without subagents" |
+| A branch for this same task already exists | Continue on it after the user's ok | `task-start` step 3 |
+| `AGENTS.md` belongs to someone else's repository and cannot be edited | Keep the profile in `.quimera/PROFILE.md`, which wins | `QUIMERA.md` "Project profile"; `project-kickoff` existing projects |
+| The project keeps its own memory files elsewhere | Use the files the profile's "Memory" line names | `QUIMERA.md` "Project memory" |
+| An approved plan covers the next task | Start it without asking again; ask only for irreversible or outside steps | `QUIMERA.md` "After the approach is agreed" |
+| Planning is done and building starts | Switch the session to the standard tier; reviews go to the strongest | `QUIMERA.md` "Roles, model tiers and effort"; the tool's adapter |

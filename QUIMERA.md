@@ -85,6 +85,7 @@ Risk raises the level even when the change is small.
 
 - Raise effort to the highest level below "max" (`xhigh` where it exists) only for genuinely complex work. Do not use "max".
 - Do not pick premium model families outside the three tiers unless the user asks.
+- The session that writes code runs on the standard tier. Planning, architecture and every review run on the strongest tier, in a session on that tier or by dispatching a subagent; search and verbose runs go to the fast tier. A whole project on the strongest model pays the top price for every line of code. Each tool adapter says how to set the session's model ("Session model").
 - Name the tier explicitly every time you dispatch a subagent. Which real model fills each tier, per provider, is in `.quimera/adapters/models.md`; how to call it in your tool is in `.quimera/adapters/<tool>.md`.
 
 ### Model profile
@@ -114,6 +115,7 @@ The project profile's "Models" line names the providers (or the exact models) th
 - `close-task` updates the memory files at the end of every task, in the same commit as the work. You decide what else is worth documenting. Keep every file short and record each fact in one place only: `docs/STATE.md` under 60 lines and 6 KB, rewritten whole; `AGENTS.md` and `docs/MAP.md` corrected in the same commit as a change that contradicts them.
 - After context compaction, or in a new session, re-read `AGENTS.md`, `docs/STATE.md` and `docs/MAP.md` before acting. What you learn about the owner goes into `AGENTS.md`, never only into a tool's private memory.
 - The repository wins over the memory: if they disagree, say so and follow the repository.
+- The profile's "Memory" line can point to files the project already keeps (for example `memory/CURRENT.md` for the state). Wherever a skill names `docs/STATE.md`, `docs/MAP.md` or `docs/DECISIONS.md`, use the file that line names; the scripts follow it too.
 
 ## Git
 
@@ -148,6 +150,8 @@ The project profile's "Models" line names the providers (or the exact models) th
 - a credential, permission or new cost is needed.
 
 Otherwise continue, and record the choice you made. This list never replaces principle 1: anything substantial still starts with agreement.
+
+Approval already given counts: what the user already authorized for this scope (an approved plan, an agreed order of phases, a standing permission in the profile) you do not ask again; ask again only when the scope changes, or when a step cannot be undone or reaches outside the project.
 
 ## Reporting to the user
 

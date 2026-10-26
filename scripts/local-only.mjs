@@ -13,7 +13,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, join } from 'node:path';
-import { BLOCK_BEGIN, BLOCK_END, LEDGERS, MEMORY_FILES, PRODUCT_DOCS, splitExclude, standardsFiles } from './lib/local-files.mjs';
+import { BLOCK_BEGIN, BLOCK_END, LEDGERS, MEMORY_FILES, PRODUCT_DOCS, memoryPaths, splitExclude, standardsFiles } from './lib/local-files.mjs';
 
 // What Quimera 0.3.0 appended: whole folders, which also hid the project's own files.
 const OLD_HEADER = '# quimera: local-only files';
@@ -67,7 +67,7 @@ const productDocs = args.includes('--product-docs') ? true : args.includes('--no
 
 const entries = [
   '/.quimera/',
-  ...[...new Set([...kitFiles.filter((p) => plain(p) && !p.startsWith('.quimera/')), ...MEMORY_FILES, ...standardsFiles(root), LEDGERS])].sort().map((p) => `/${p}`),
+  ...[...new Set([...kitFiles.filter((p) => plain(p) && !p.startsWith('.quimera/')), ...MEMORY_FILES, ...Object.values(memoryPaths(root)), ...standardsFiles(root), LEDGERS])].sort().map((p) => `/${p}`),
   ...(productDocs ? PRODUCT_DOCS.map((p) => `/${p}`) : []),
   '*.quimera-new',
 ];

@@ -118,7 +118,7 @@ One or two lines, in the user's language:
 
 Example (to a Portuguese-speaking user): "Profundidade: normal (mexe em três telas e na API de pedidos). Branch `feat/order-export`. Próximo passo: plano em `docs/plans/`."
 
-For normal and risky work, wait for the user to confirm your reading of the task before planning.
+For normal and risky work, wait for the user to confirm your reading of the task before planning, unless the user already confirmed this scope (an approved plan or an agreed order of phases covers the tasks inside it).
 
 ## Common mistakes
 

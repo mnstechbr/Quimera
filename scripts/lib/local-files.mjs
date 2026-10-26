@@ -17,6 +17,20 @@ export const MEMORY_FILES = [
 ];
 // The owner's own documents: excluded in local-only mode only when the owner chooses so.
 export const PRODUCT_DOCS = ['docs/vision/', 'docs/studies/', 'docs/plans/', 'docs/reviews/'];
+// The state, map and decisions files: the defaults, or the files the profile's "Memory" line names
+// (for example: state `memory/CURRENT.md` · map `docs/MAP.md` · decisions `docs/DECISIONS.md`).
+export function memoryPaths(root) {
+  const paths = { state: 'docs/STATE.md', map: 'docs/MAP.md', decisions: 'docs/DECISIONS.md' };
+  const profile = ['.quimera/PROFILE.md', 'AGENTS.md'].map((f) => join(root, f)).find((f) => existsSync(f));
+  const line = profile ? readFileSync(profile, 'utf8').match(/\*\*Memory:\*\*\s*(.+)/i)?.[1] : null;
+  for (const key of Object.keys(paths)) {
+    const p = line?.match(new RegExp(`${key}\\s+\`([^\`]+)\``, 'i'))?.[1];
+    // Only a plain relative path inside the project counts.
+    if (p && /^[\w.@+-][\w./@+ -]*$/.test(p) && !p.split('/').includes('..')) paths[key] = posix.normalize(p);
+  }
+  return paths;
+}
+
 // parallel-agents working files: process memory, not product documents.
 export const LEDGERS = 'docs/plans/*.ledger.md';
 

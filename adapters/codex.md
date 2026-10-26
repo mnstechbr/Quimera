@@ -22,6 +22,10 @@ Use the OpenAI table in `models.md`, in the project's model profile: full is GPT
 
 Model names change often. The profile's "Models" line wins: write the exact names there if you want them fixed.
 
+### Session model
+
+Use `/model` to switch: the strongest tier (GPT-6.1 Sol, high) to plan and review, the standard tier (Sol at medium in the full profile, Luna at medium in the economic one) to build. Reviews of risky work go to a session on the strongest tier.
+
 ## Discreet mode
 
 - Install the commit-msg guard (`node .quimera/scripts/install-hooks.mjs`).

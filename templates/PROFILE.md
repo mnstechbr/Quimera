@@ -12,3 +12,4 @@
 - **Integrating:** {{ask every time | after each verified task — date}} (finished task branches into the default branch, on this machine)
 - **Specialist reviewers:** {{security, database, interface | off}}
 - **Models:** {{providers or exact models, e.g. Anthropic}} · {{full | economic}} (tiers per `.quimera/adapters/models.md`)
+- **Memory:** {{docs/ (the default) | state `…` · map `…` · decisions `…`, when the project keeps its own files}}

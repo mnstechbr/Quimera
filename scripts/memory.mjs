@@ -14,7 +14,7 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { isAbsolute, join } from 'node:path';
-import { MEMORY_FILES, PRODUCT_DOCS, splitExclude, standardsFiles } from './lib/local-files.mjs';
+import { MEMORY_FILES, PRODUCT_DOCS, memoryPaths, splitExclude, standardsFiles } from './lib/local-files.mjs';
 
 const [command, ...rest] = process.argv.slice(2);
 const message = rest[0] === '-m' && rest[1] ? rest[1] : null;
@@ -44,7 +44,7 @@ function paths() {
   const tracked = existsSync(MEMORY) ? mem(['ls-files']).split('\n').filter(Boolean) : [];
   // Only what exists now, or what was saved before (so a deletion is recorded too).
   const ledgers = existsSync('docs/plans') ? readdirSync('docs/plans').filter((f) => f.endsWith('.ledger.md')).map((f) => `docs/plans/${f}`) : [];
-  return [...new Set([...MEMORY_FILES, ...standardsFiles(root), ...ledgers, ...docs])].filter((p) => existsSync(p) || tracked.some((t) => t === p || t.startsWith(p)));
+  return [...new Set([...MEMORY_FILES, ...Object.values(memoryPaths(root)), ...standardsFiles(root), ...ledgers, ...docs])].filter((p) => existsSync(p) || tracked.some((t) => t === p || t.startsWith(p)));
 }
 
 function save(text) {

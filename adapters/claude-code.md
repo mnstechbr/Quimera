@@ -29,6 +29,10 @@ The model and effort for each tier, in the full and the economic profile, are in
 - **Specialists (kickoff step 3).** Install only the specialist reviewer agents the profile keeps: `npx github:mnstechbr/Quimera update --specialists=<security,database,interface|none>`. The general reviewer, implementer and explorer are always installed.
 - **Other providers inside Claude Code.** If you run DeepSeek, MiMo or another provider through a launcher that points Claude Code at their endpoint, the launcher decides which real model each alias (`opus`, `sonnet`, `haiku`) calls. For a two-size provider, map `opus` → the large model (DeepSeek V4 Pro, MiMo-V2.6 Pro) and `sonnet` and `haiku` → the small one, keep the **full** role agents (do not use `--models=economic`, which would put reviewers on `sonnet`, the small model), and dispatch every reviewer, including `quimera-interface-reviewer`, with `model: opus`. A whole session launched that way is also a way to hand work to another model: give it the same brief a subagent would get, wait for it to finish, then review.
 
+### Session model
+
+Plan, review the vision and the architecture, and talk through decisions on the strongest tier (`/model opus`). Once the plan is approved, build on the standard tier (`/model sonnet`, or a new session started on it), and dispatch reviews to `quimera-reviewer` and the specialists, which carry the strongest tier; searches go to `quimera-explorer`. In the economic profile the same split runs one tier down: `/model sonnet` to plan, and `/model haiku` only for tasks whose plan holds the exact change.
+
 ## Role agents installed in `.claude/agents/`
 
 | Agent | Full | Economic | Use |

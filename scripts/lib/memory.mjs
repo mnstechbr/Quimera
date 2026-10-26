@@ -5,8 +5,8 @@
 // Each problem is one line that names the file and what to do.
 
 import { existsSync, readFileSync, statSync } from 'node:fs';
+import { memoryPaths } from './local-files.mjs';
 
-export const STATE_FILE = 'docs/STATE.md';
 export const MAX_LINES = 60;
 export const MAX_BYTES = 6 * 1024;
 // close-task rewrites STATE.md in the same commit as the work, so a few commits without it
@@ -14,7 +14,8 @@ export const MAX_BYTES = 6 * 1024;
 const MAX_COMMITS_SINCE = 3;
 
 // `git(args)` returns trimmed stdout, or null when the command fails. `branch` is the current branch.
-export function memoryProblems({ git, branch, file = STATE_FILE }) {
+// The state file is docs/STATE.md, or the one the profile's "Memory" line names. Run from the root.
+export function memoryProblems({ git, branch, file = memoryPaths('.').state }) {
   if (!existsSync(file)) return [];
   const lastCommit = git(['log', '-1', '--format=%cI']);
   if (!lastCommit) return []; // no commits yet: nothing to compare with

@@ -18,6 +18,10 @@ Folder locations taken from GitHub Spec Kit's integrations. Confirm them in your
 
 Use the table in `models.md` for the provider the tool runs, in the project's model profile (full or economic), and keep the effort ceiling in `QUIMERA.md`.
 
+### Session model
+
+Use the tool's model setting: the strongest tier while planning and reviewing, the standard tier while building. If the tool has one model for everything, say so in the report; reviews of risky work then go to a session in another tool on the strongest tier.
+
 ## Without subagents
 
 Follow the inline fallback in the `parallel-agents` skill: run the tasks one by one, with the same ledger, checks and independent review.
