@@ -11,14 +11,14 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync, chmodSync } from 'node:fs';
-import { dirname, isAbsolute, join, relative } from 'node:path';
+import { dirname, isAbsolute, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { PROFILES, TOOLS, readManifest } from './lib/manifest.mjs';
+import { diskProblem, present } from './lib/paths.mjs';
 
 const KIT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const VERSION = JSON.parse(readFileSync(join(KIT, 'package.json'), 'utf8')).version;
 const MANIFEST = '.quimera/manifest.json';
-const TOOLS = ['claude', 'codex', 'copilot', 'cursor', 'antigravity', 'other'];
-const PROFILES = ['full', 'economic'];
 // Claude Code role agents in the economic model profile (adapters/models.md): reviewers on the
 // mid-size model, code and search on the small one. The full profile keeps each file as shipped.
 const ECONOMIC_AGENTS = {
@@ -55,8 +55,8 @@ const sha = (path) => shaOf(readFileSync(path));
 // their model and effort lines, so the agent bodies are never duplicated in the kit.
 function content(src, dest, models) {
   const buf = readFileSync(src);
-  if (models !== 'economic' || !dest.startsWith(join('.claude', 'agents'))) return buf;
-  const name = dest.split(/[\\/]/).pop();
+  if (models !== 'economic' || !dest.startsWith('.claude/agents/')) return buf;
+  const name = dest.split('/').pop();
   const [model, effort] = ECONOMIC_AGENTS[name] ?? ECONOMIC_AGENTS.default;
   return Buffer.from(
     buf.toString('utf8').replace(/^model: .*$/m, `model: ${model}`).replace(/^effort: .*$/m, `effort: ${effort}`),
@@ -68,10 +68,10 @@ const walk = (dir) =>
     return statSync(p).isDirectory() ? walk(p) : [p];
   });
 
-// What goes where: [source in the kit, destination in the project]
+// What goes where: [source in the kit, destination in the project, with forward slashes]
 function plan(tools) {
   const pairs = [];
-  const add = (src, dest) => pairs.push([src, dest]);
+  const add = (src, dest) => pairs.push([src, dest.split(sep).join('/')]);
   add(join(KIT, 'QUIMERA.md'), '.quimera/QUIMERA.md');
   for (const dir of ['scripts', 'adapters', 'templates']) {
     for (const f of walk(join(KIT, dir))) {
@@ -95,18 +95,34 @@ function plan(tools) {
   return pairs;
 }
 
+// Stops before anything is written: every problem is listed, and the project stays as it was.
+function refuse(problems) {
+  console.error(`Quimera stopped:\n${problems.map((p) => `  ${p}`).join('\n')}`);
+  console.error('Nothing was changed. Fix or restore what is listed, then run the command again.');
+  process.exit(1);
+}
+
+// The manifest, checked as a whole before any of its paths is used.
+function loadManifest(root) {
+  const unsafe = diskProblem(root, MANIFEST, { own: true });
+  if (unsafe) refuse([unsafe]);
+  const { manifest, problems } = readManifest(readFileSync(MANIFEST, 'utf8'));
+  if (problems.length) refuse(problems.map((p) => `${MANIFEST}: ${p}`));
+  return manifest;
+}
+
 function install({ update }) {
   const root = repoRoot();
   process.chdir(root);
-  const manifest = existsSync(MANIFEST) ? JSON.parse(readFileSync(MANIFEST, 'utf8')) : { files: {} };
-  if (update && !existsSync(MANIFEST)) {
+  if (update && !present(MANIFEST)) {
     console.error('Quimera is not installed here. Use: quimera init');
     process.exit(1);
   }
-  if (!update && existsSync(MANIFEST)) {
+  if (!update && present(MANIFEST)) {
     console.error('Quimera is already installed here. Use: quimera update');
     process.exit(1);
   }
+  const manifest = update ? loadManifest(root) : { files: {} };
 
   const tools = update
     ? manifest.tools
@@ -129,8 +145,17 @@ function install({ update }) {
   const result = { written: [], kept: [], skipped: [], removed: [], orphaned: [] };
   const files = { ...manifest.files };
   const pairs = plan(tools);
+
+  // Every path this run may read, write or delete is checked on disk first.
+  const paths = new Set([...pairs.map(([, dest]) => dest), ...Object.keys(files)]);
+  const unsafe = [
+    diskProblem(root, MANIFEST, { own: true }),
+    ...[...paths].flatMap((p) => [diskProblem(root, p, { own: p in files }), diskProblem(root, `${p}.quimera-new`, { own: true })]),
+  ].filter(Boolean);
+  if (unsafe.length) refuse([...new Set(unsafe)]);
+
   for (const [src, dest] of pairs) {
-    const exists = existsSync(dest);
+    const exists = present(dest);
     const ours = files[dest];
     const next = content(src, dest, models);
     if (exists && !ours) {
@@ -140,7 +165,7 @@ function install({ update }) {
     }
     const newCopy = `${dest}.quimera-new`;
     const dropStaleCopy = () => {
-      if (!dryRun && existsSync(newCopy)) rmSync(newCopy);
+      if (!dryRun && present(newCopy)) rmSync(newCopy);
     };
     if (exists && ours && sha(dest) !== ours) {
       // We created it but it was edited locally.
@@ -177,11 +202,11 @@ function install({ update }) {
     const shipped = new Set(pairs.map(([, dest]) => dest));
     for (const dest of Object.keys(files)) {
       if (shipped.has(dest)) continue;
-      if (existsSync(dest) && sha(dest) !== files[dest]) {
+      if (present(dest) && sha(dest) !== files[dest]) {
         result.orphaned.push(dest);
         continue;
       }
-      if (!dryRun && existsSync(dest)) rmSync(dest);
+      if (!dryRun && present(dest)) rmSync(dest);
       if (!dryRun) delete files[dest];
       result.removed.push(dest);
     }
@@ -212,9 +237,11 @@ function install({ update }) {
     } catch {}
   }
 
+  // Helpers run from this kit, never from the project: a copy there may be old, edited or not ours.
+  const helper = (name) => spawnSync(process.execPath, [join(KIT, 'scripts', name)], { stdio: 'inherit' });
   const mode = value('mode');
-  if (!update && mode === 'discreet' && !dryRun) spawnSync('node', ['.quimera/scripts/install-hooks.mjs'], { stdio: 'inherit' });
-  if (!update && flag('local-only') && !dryRun) spawnSync('node', ['.quimera/scripts/local-only.mjs'], { stdio: 'inherit' });
+  if (!update && mode === 'discreet' && !dryRun) helper('install-hooks.mjs');
+  if (!update && flag('local-only') && !dryRun) helper('local-only.mjs');
 
   const n = (a) => a.length;
   console.log(`${dryRun ? '[dry run] ' : ''}Quimera ${VERSION} ${update ? 'updated' : 'installed'} · tools: ${tools.join(', ')} · models: ${models}`);
@@ -223,7 +250,7 @@ function install({ update }) {
   if (n(result.removed)) console.log(`  removed ${n(result.removed)} file(s) the kit no longer ships`);
   if (n(result.orphaned)) console.log(`  no longer shipped but edited by you, left in place:\n${result.orphaned.map((f) => `    ${f}`).join('\n')}`);
   if (n(result.skipped)) console.log(`  left untouched (not created by Quimera):\n${result.skipped.map((f) => `    ${f}`).join('\n')}`);
-  if (result.skipped.includes('CLAUDE.md')) {
+  if (result.skipped.includes('CLAUDE.md') && existsSync('CLAUDE.md')) {
     const text = readFileSync('CLAUDE.md', 'utf8');
     if (!/^@AGENTS\.md\s*$/m.test(text)) console.log('  note: your CLAUDE.md does not import AGENTS.md, so Claude Code will not read it. Add a line "@AGENTS.md".');
   }
@@ -236,16 +263,16 @@ function install({ update }) {
 function doctor() {
   const root = repoRoot();
   process.chdir(root);
-  if (!existsSync(MANIFEST)) {
+  if (!present(MANIFEST)) {
     console.log('Quimera is not installed here.');
     process.exit(1);
   }
-  const m = JSON.parse(readFileSync(MANIFEST, 'utf8'));
-  const missing = Object.keys(m.files).filter((f) => !existsSync(f));
+  const m = loadManifest(root);
+  const missing = Object.keys(m.files).filter((f) => !present(f));
   console.log(`Quimera ${m.version}${m.source ? ` (${m.source})` : ''} · tools: ${m.tools.join(', ')} · models: ${m.models ?? 'full'} · kit available: ${VERSION}`);
   console.log(missing.length ? `missing files:\n${missing.map((f) => `  ${f}`).join('\n')}` : 'all kit files present');
   console.log(existsSync('AGENTS.md') ? 'AGENTS.md present' : 'no AGENTS.md yet: run the project-kickoff skill');
-  const r = spawnSync('node', ['.quimera/scripts/git-preflight.mjs', '--no-fetch'], { stdio: 'inherit' });
+  const r = spawnSync(process.execPath, [join(KIT, 'scripts', 'git-preflight.mjs'), '--no-fetch'], { stdio: 'inherit' });
   process.exit(missing.length || r.status ? 1 : 0);
 }
 

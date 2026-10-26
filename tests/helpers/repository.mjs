@@ -7,7 +7,7 @@
 
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, readlinkSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -36,6 +36,23 @@ function isolatedEnv(home) {
 }
 
 const sha = (buf) => createHash('sha256').update(buf).digest('hex');
+
+// Every file under `dir` with its digest (a symlink with its target), to prove that nothing changed.
+export function snapshot(dir, skip = ['.git']) {
+  const out = {};
+  const visit = (rel) => {
+    for (const name of readdirSync(join(dir, rel))) {
+      const r = rel ? `${rel}/${name}` : name;
+      if (skip.includes(r)) continue;
+      const st = lstatSync(join(dir, r));
+      if (st.isSymbolicLink()) out[r] = `link:${readlinkSync(join(dir, r))}`;
+      else if (st.isDirectory()) visit(r);
+      else out[r] = sha(readFileSync(join(dir, r)));
+    }
+  };
+  visit('');
+  return out;
+}
 
 function run(cmd, args, { cwd, env }) {
   const r = spawnSync(cmd, args, { cwd, env, encoding: 'utf8' });
@@ -76,6 +93,8 @@ export function createRepo(t, { branch = 'main', commit = true } = {}) {
     // Runs the installer of `kit` (this kit by default) inside the repository.
     quimera: (args, { kit = KIT } = {}) => run(process.execPath, [join(kit, 'bin', 'quimera.mjs'), ...args], { cwd: root, env }),
     manifest: () => JSON.parse(readFileSync(join(root, '.quimera', 'manifest.json'), 'utf8')),
+    setManifest: (m) => writeFileSync(join(root, '.quimera', 'manifest.json'), JSON.stringify(m, null, 2)),
+    snapshot: () => snapshot(root),
   };
 
   repo.git('init', '--quiet', `--initial-branch=${branch}`);
