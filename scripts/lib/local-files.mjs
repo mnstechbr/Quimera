@@ -42,7 +42,7 @@ export function standardsFiles(root) {
   const found = new Set();
   for (const [, p] of text.matchAll(/(docs\/standards\/[\w./-]+\.md)/g)) found.add(posix.normalize(p));
   for (const [, p] of text.matchAll(/\]\(([\w./-]+\.md)\)/g)) found.add(p.startsWith('docs/') ? posix.normalize(p) : posix.join('docs/standards', p));
-  return [...found].filter((p) => p.startsWith('docs/standards/') && p !== 'docs/standards/INDEX.md').sort();
+  return [...found].filter((p) => p.startsWith('docs/standards/') && p !== 'docs/standards/INDEX.md' && !p.split('/').some((s) => s.toLowerCase() === '.git')).sort();
 }
 
 // The block local-only.mjs owns in .git/info/exclude.

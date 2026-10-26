@@ -105,6 +105,7 @@ Only when the user says the branch or pull request was merged:
 - Remove only worktrees you created for this task, from outside the worktree: `git worktree remove <path>`, then `git worktree prune`.
 - If removal is refused because of modified or untracked files, those files exist nowhere else. Show them (`git -C <path> status --porcelain -uall`) and ask: commit them, move them, or delete them. Deleting needs the user's typed confirmation. Never add `--force` on your own.
 - Leave worktrees managed by the tool or by another session alone.
+- In a local-only project, a linked worktree keeps its own private memory history, and removing the worktree removes it: save what matters into the main working tree first.
 
 ## 9. Report to the user
 

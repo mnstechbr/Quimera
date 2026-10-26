@@ -20,7 +20,7 @@ Three ways in. Every command runs inside the project's git repository; replace `
 
 1. `npx github:mnstechbr/Quimera#v0.4.0 init --tools=claude --mode=discreet --local-only`
 2. The kit and your memory files stay out of git on this machine; your own files in the same folders stay visible.
-3. `node .quimera/scripts/memory.mjs init` keeps a private history of the memory in `.git/quimera-memory.git`, with no remote.
+3. `node .quimera/scripts/memory.mjs init` keeps a private history of the memory in `.git/quimera-memory.git` (in a linked worktree, that worktree's own git folder), with no remote.
 
 ## Every task after that
 

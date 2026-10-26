@@ -7,8 +7,8 @@
 //
 // In local-only mode the memory files (docs/STATE.md, DECISIONS.md, …) are kept out of the
 // project's git, so without this they have no history and no copy. This keeps a separate git
-// repository in the project's git folder (.git/quimera-memory.git) that tracks only those files, in
-// place. It lives there because a clone never carries that folder: a memory repository inside the
+// repository in the project's git folder (.git/quimera-memory.git; in a linked worktree, that
+// worktree's own git folder, removed with it) that tracks only those files, in place. It lives there because a clone never carries that folder: a memory repository inside the
 // working tree could arrive with a hostile configuration that git would obey. It never creates a remote and never pushes: to keep a copy elsewhere, the owner
 // adds a private remote and pushes it by hand. Exit 0 done · 1 failed · 2 not a git repository · 64 bad usage.
 

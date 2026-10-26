@@ -7,7 +7,7 @@ import { existsSync, readFileSync, statSync, symlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { pathProblem } from '../bin/lib/paths.mjs';
-import { memoryPaths } from '../scripts/lib/local-files.mjs';
+import { memoryPaths, standardsFiles } from '../scripts/lib/local-files.mjs';
 import { IDENTITY, KIT, createRepo } from './helpers/repository.mjs';
 
 const posix = process.platform === 'win32' ? 'POSIX permissions and devices' : false;
@@ -53,6 +53,8 @@ test('a Memory line may name only Markdown files inside the project', (t) => {
   }
   repo.write('AGENTS.md', '# Fixture\n\n- **Memory:** state `memory/CURRENT.md`\n');
   assert.equal(memoryPaths(repo.root).state, 'memory/CURRENT.md');
+  repo.write('docs/standards/INDEX.md', '- `docs/standards/.git/x.md`\n- `docs/standards/api/errors.md`\n');
+  assert.deepEqual(standardsFiles(repo.root), ['docs/standards/api/errors.md']);
 });
 
 test('a huge profile line does not hang the preflight', (t) => {
