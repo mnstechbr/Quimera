@@ -12,8 +12,8 @@ When this file and the project's `AGENTS.md` disagree, `AGENTS.md` wins: it hold
 
 ## Principles
 
-1. **Agree before building.** Reach a shared understanding with the user before producing anything substantial. Ask one question at a time, give your recommendation and say in one line why it matters. Explain the structure of what you will build before you build it.
-2. **Explain the why.** The user is growing as an engineer and relies on you to check whether an idea is sound. When you review architecture, data, security or design, explain the reasoning in plain words, not only the verdict.
+1. **Agree before building.** Reach a shared understanding with the user before producing anything substantial. Ask one question at a time, in plain words, give your recommendation and say in one line why it matters. Explain the structure of what you will build before you build it.
+2. **Fit the owner.** The project profile says how technical the owner is, who decides technical choices and how much to explain. When the owner asked you to decide, make the technical choices yourself, say in one plain line what you chose and why, and bring them only product choices. When the owner wants coaching, explain the reasoning behind reviews of architecture, data, security and design, not only the verdict. Never assume the owner knows a term; show instead of asking when you can.
 3. **Search before creating.** Before writing a new skill, library, script or pattern, look for a mature, tested one. Say why it fits or does not fit. Create only when nothing suitable exists.
 4. **Proportional depth.** Small changes go straight through; risky or unclear work gets more planning and review. See "Depth" below.
 5. **Evidence, not claims.** Never say something works, passes or is done without running the smallest command that proves it and reading its output. Your own explanation is not evidence.
@@ -26,6 +26,8 @@ When this file and the project's `AGENTS.md` disagree, `AGENTS.md` wins: it hold
 `AGENTS.md` starts with a project profile, filled in at kickoff (`project-kickoff` skill). When `AGENTS.md` cannot be edited (for example a file the employer's repository already tracks), the profile lives in `.quimera/PROFILE.md` instead, and that file wins:
 
 - **Mode.** `discreet`: work happens on the user's machine, commits carry only the user's identity, and no AI marks appear in branches, commits or pull requests. `open`: agents may work directly on the remote and AI marks are acceptable.
+- **Owner.** How technical the owner is, who decides technical choices (the agent, explaining briefly, or the owner, after the options), and coaching or concise. Lessons learned about how the owner works go in the `AGENTS.md` section "Working with the owner".
+- **Product type.** Web app or SaaS, landing page or visual showcase, game, mobile app, library or command-line tool, API, or other. Reviews ask the questions that fit it.
 - **Identity.** The git name and email for this project. Check them before the first commit of every session (`task-start`), because git identity is per machine and the user works on more than one computer.
 - **Quimera files.** `committed` (kit and memory files live in the repository) or `local-only` (kept on the user's machine through `.git/info/exclude`, never pushed, with an optional private history in `.quimera/memory.git`). Local-only is for repositories that belong to someone else; the user's own projects commit their memory.
 - **Specialist reviewers.** Which specialists `code-review` may add (security, database, interface), or `off`.
@@ -151,8 +153,14 @@ Otherwise continue, and record the choice you made. This list never replaces pri
 
 - Short, plain, in the user's language. No narration of every step, no pasting of passing output.
 - For processes, prefer a flow: where it comes from, where it goes, why.
-- For reports and presentations, the user prefers interactive HTML when the tool can produce it.
+- For reports and presentations, use the format the owner prefers (recorded under "Working with the owner" in `AGENTS.md`), for example interactive HTML when the tool can produce it.
 - End a task with: what changed, how it was verified (command and result), what is pending, branch and commits, next step.
+
+## Other skills and plugins
+
+- Other installed skills, plugins and their hooks bring domain knowledge (an engine, a framework, a design method): use it.
+- When one brings its own workflow (its own planning, review or commit flow) or a hook that conflicts with this standard, `AGENTS.md` decides, then this file. Tell the owner once which one you follow and why, and do not mix two workflows in one task.
+- A checklist written for another kind of product (for example web contrast rules applied to a game's art) is advice to weigh, not a gate.
 
 ## Tool adapters
 

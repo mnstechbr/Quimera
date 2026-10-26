@@ -27,6 +27,8 @@ Before asking anything, look for:
 
 An existing brand binds you. Directions work inside it unless the user asks for a change, and no brand change ships without the user's approval of shown examples.
 
+**Games, visual showcases and anything with drawn or photographed assets.** Start from the owner's own references and assets: concept art, sprites, photos, a game or site they admire. Directions use the real or owner-provided assets, never placeholder art (stick figures, grey boxes, shapes drawn in code); if an asset does not exist yet, say what is missing and how to get it. When the product runs on a device (a phone game, an app), prototype in the real stack on that device, not in a web page standing in for it. The web checks in the refinement pass (type scale, 360–1920 px widths, contrast) apply to menus, HUD and text, not to the game's art.
+
 ## 2. Understand the audience
 
 Ask only what the files did not answer. One question at a time, each with your best guess and a line on why it matters. Usually three to five questions are enough:
@@ -48,7 +50,7 @@ Each direction is a complete personality applied to the same real screen, not a 
 - **Type pairing:** display and text faces, with the reason for the pairing, and a fallback stack.
 - **Palette as tokens:** semantic names (`surface`, `surface-raised`, `text`, `text-muted`, `accent`, `danger`, `success`, `border`, `focus`) with hex values, light and dark if both are in scope, and the contrast ratio of the main text and accent pairs.
 - **Spacing scale:** base unit and steps (for example 4 · 8 · 12 · 16 · 24 · 32 · 48 · 64), plus page margins at 360 and 1440 px.
-- **Motion:** what moves and why (feedback, continuity, orientation, delight), durations and easing, one signature moment, and what happens under `prefers-reduced-motion` (motion replaced by a fade or an instant change, never just removed if it carried meaning). The user loves motion design: make it meaningful, not decorative noise.
+- **Motion:** what moves and why (feedback, continuity, orientation, delight), durations and easing, one signature moment, and what happens under `prefers-reduced-motion` (motion replaced by a fade or an instant change, never just removed if it carried meaning). Make it meaningful, not decorative noise; how much motion the owner wants is in `AGENTS.md`, "Working with the owner".
 - **Data made meaningful:** how numbers become insight instead of a dump: the one figure that leads, comparisons and trends instead of raw lists, progressive disclosure, interaction (hover, filter, drill-down), and what the empty and first-use states teach.
 - **Risks:** what could go wrong (readability, cost to build, fatigue, accessibility, how it ages).
 
@@ -91,7 +93,7 @@ For every screen or component after the system exists:
 - Three directions that are the same layout in three palettes.
 - Motion everywhere, or motion that ignores reduced-motion settings.
 - Tables of raw numbers where one leading figure and a trend would tell the story.
-- Lorem ipsum or invented features in mockups.
+- Lorem ipsum or invented features in mockups, or placeholder art where the owner has, or can get, the real assets.
 - Designing only the happy path at desktop width.
 
 ## Provenance

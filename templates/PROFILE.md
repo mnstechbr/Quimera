@@ -2,6 +2,8 @@
 
 > Used only when `AGENTS.md` cannot be edited (for example a file the employer's repository already tracks, in local-only mode). When this file exists, it wins over the profile in `AGENTS.md`. It stays on this machine: `.quimera/` is excluded from git in local-only mode.
 
+- **Owner:** {{how technical, in the owner's words}} · decisions: {{decide technical choices and explain briefly | explain the options and ask}} · {{coaching | concise}}
+- **Product type:** {{web app or SaaS | landing page or visual showcase | game | mobile app | library or command-line tool | API | other}}
 - **Mode:** {{discreet | open}}
 - **Git identity:** {{NAME}} <{{EMAIL}}>
 - **Quimera files:** local-only

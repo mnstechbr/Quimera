@@ -7,7 +7,7 @@ description: "Use after the approach is chosen (kickoff) and again at the end of
 
 Review `docs/VISION.md` the way a senior engineer would before anyone builds: find what is missing or vague, ask the user about the most important gaps, write the answers back into the document, and say honestly whether the vision is ready to build on.
 
-The user is learning. Every question explains in one plain sentence why it matters. Coach, do not quiz: when an answer is thin, push back once with a concrete example; ease off when the user signals they are done.
+Follow the owner profile in `AGENTS.md`. Every question explains in one plain sentence why it matters, without jargon. With an owner who wants coaching, push back once with a concrete example when an answer is thin; with a concise owner, ask fewer questions. Ask the owner product questions only: when the profile says you decide technical choices, make them yourself and record them as `[ASSUMPTION]`. Ease off when the owner signals they are done.
 
 This review covers the product, not the implementation. Stack, schema and library choices belong to `architecture-review`; screens and visual style to `design-directions`.
 
@@ -25,7 +25,7 @@ This review covers the product, not the implementation. Stack, schema and librar
 
 ## 2. Scan
 
-Check the vision against every category in `references/categories.md`. Mark each one, privately: **Clear**, **Partial** or **Missing**. Treat as Partial:
+Check the vision against the core categories in `references/categories.md` and the set for the project's type (the profile's "Product type" line; ask the owner if it is missing). A category from another set applies only when the vision makes it relevant, for example a game with player accounts. Mark each one, privately: **Clear**, **Partial** or **Missing**. Treat as Partial:
 
 - Adjectives without numbers: "fast", "secure", "scalable", "intuitive", "cheap".
 - Boilerplate that could be pasted into any product ("the system must be reliable").
@@ -88,7 +88,7 @@ Then give one verdict, with the why in plain words:
 
 - **Ready:** every high-impact category is Clear.
 - **Ready with assumptions:** the remaining gaps are `[ASSUMPTION]` items of low or medium impact. List each one and when it should be confirmed.
-- **Not ready:** a high-impact category is Missing (for example problem and who has it, success criteria, data and LGPD, cost per customer, security), or an unconfirmed assumption could change the architecture. Say what is missing and the cheapest way to resolve it.
+- **Not ready:** a high-impact category is Missing (for example problem and who has it, success criteria, the quality bar, and for products with customer data: data and LGPD, cost per customer, security), or an unconfirmed assumption could change the architecture. Say what is missing and the cheapest way to resolve it.
 
 Append the verdict to the session: `- **Readiness:** <verdict> — <one-line why>`.
 
@@ -106,6 +106,7 @@ Short, in the user's language:
 - A "why it matters" that repeats the question instead of naming the consequence.
 - Rewriting earlier review answers or the user's original words.
 - Asking about the tech stack here.
+- Asking SaaS questions (roles, cost per customer) about a game or a showcase, or game questions about an API.
 - Saying "ready" while success criteria are still adjectives.
 - Leaving inferred statements untagged, so they read as decisions.
 

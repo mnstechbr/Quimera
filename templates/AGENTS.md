@@ -4,6 +4,8 @@
 
 ## Project profile
 
+- **Owner:** {{how technical, in the owner's words}} · decisions: {{decide technical choices and explain briefly | explain the options and ask}} · {{coaching | concise}}
+- **Product type:** {{web app or SaaS | landing page or visual showcase | game | mobile app | library or command-line tool | API | other}}
 - **Mode:** {{discreet | open}}
 - **Git identity:** {{NAME}} <{{EMAIL}}>
 - **Quimera files:** {{committed | local-only}}
@@ -23,6 +25,10 @@ This project follows Quimera (`.quimera/QUIMERA.md`; skills in `.agents/skills/<
 4. Commit with `docs/STATE.md` rewritten in the same commit (`close-task`), then integrate or push as the profile says.
 5. After context compaction, or in a new session, re-read this file, `docs/STATE.md` and `docs/MAP.md` before acting.
 6. At the end of each phase or milestone, run `code-review` and the whole of `close-task`.
+
+## Working with the owner
+
+{{What works with this owner, learned along the way: preferences, the quality bar, words to avoid, how they test and approve, the report format they like. Add a line whenever the owner corrects how you work; never keep it only in a tool's private memory.}}
 
 ## Stack and commands
 

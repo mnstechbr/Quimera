@@ -16,3 +16,7 @@ One next action for each situation the pilots showed going wrong, and where the 
 | A finished task branch in a project with no remote | Integrate it into the default branch (`close-task` step 6) before the next task | `close-task`; `task-start` step 4 |
 | `verify.mjs` ends `unverified` | Make the missing check runnable, or report it as not verified with the reason | `verification` "The two commands" |
 | Something learned about how the owner works | Write it in `AGENTS.md`, not only in a tool's private memory | `QUIMERA.md` "Project memory" |
+| A non-technical owner, and a technical choice comes up | Decide it yourself and say in one plain line what you chose and why | `QUIMERA.md` principle 2; profile "Owner" |
+| A game (or any other product type) at project start | Run `vision-review` with the core categories and that type's set | `vision-review`; `references/categories.md` |
+| Another workflow skill pack or plugin is installed | Follow `AGENTS.md`, then `QUIMERA.md`, and tell the owner once which workflow you follow | `QUIMERA.md` "Other skills and plugins" |
+| Design directions for a game or a visual showcase | Start from the owner's references and real assets, never placeholder art | `design-directions` step 1 |
