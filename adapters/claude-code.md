@@ -1,10 +1,14 @@
 # Claude Code adapter
 
-How the actions named in Quimera skills map to Claude Code. Verified against the Claude Code docs (code.claude.com/docs) in October 2026.
+How the actions named in Quimera skills map to Claude Code.
+
+**Status:** tested — skills, role agents and a skill load checked in a real session (`docs/compatibility.md`).
+**Checked:** 2026-10-26, Claude Code 2.1.310.
+**Sources:** https://code.claude.com/docs/en/memory · https://code.claude.com/docs/en/skills · https://code.claude.com/docs/en/sub-agents · https://code.claude.com/docs/en/hooks
 
 ## Where Claude Code reads things
 
-- **Instructions:** Claude Code reads `AGENTS.md` only when the project has no `CLAUDE.md`. If a `CLAUDE.md` exists, it must contain the line `@AGENTS.md`, or `AGENTS.md` is ignored. The installer writes a `CLAUDE.md` with that import.
+- **Instructions:** by default Claude Code reads `AGENTS.md` only when there is no `CLAUDE.md`, `.claude/CLAUDE.md` or `CLAUDE.local.md` in the working folder or above it. When one of them exists, it must contain the line `@AGENTS.md`, or `AGENTS.md` is ignored. The installer writes a `CLAUDE.md` with that import. (The "Project instructions" setting can also load both files together.)
 - **Skills:** `.claude/skills/<name>/SKILL.md`. The installer mirrors `.agents/skills/` there.
 - **Subagents:** `.claude/agents/*.md`. The installer adds six role agents (below).
 - **Cloud sessions** (claude.ai/code) load everything committed in the repository (`AGENTS.md`, `CLAUDE.md`, `.claude/skills`, `.claude/agents`, `.claude/settings.json` hooks). They do **not** load your `~/.claude` folder, and they do not install plugins listed in the repository's settings. In local-only mode the Quimera files are not committed, so cloud sessions will not see them: work locally.

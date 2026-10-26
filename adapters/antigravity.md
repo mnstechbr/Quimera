@@ -1,19 +1,24 @@
 # Google Antigravity adapter
 
-How the actions named in Quimera skills map to Google Antigravity (IDE and CLI). Checked against public guides (not Google's own docs) in October 2026; confirm in Antigravity's docs if something does not load.
+How the actions named in Quimera skills map to Google Antigravity (app, IDE and CLI).
+
+**Status:** experimental — checked against Google's documentation, not yet in a real session (`docs/compatibility.md`).
+**Checked:** 2026-10-26.
+**Sources:** https://antigravity.google/docs/changelog · https://antigravity.google/docs/rules/ · https://antigravity.google/docs/skills · https://antigravity.google/docs/subagents/ · https://antigravity.google/docs/models/
 
 ## Where Antigravity reads things
 
-- **Instructions:** Antigravity reads `AGENTS.md` from version 1.20.5 on, besides its own `GEMINI.md`. On an older version, add a `GEMINI.md` with the line "Read AGENTS.md and follow it." When both files exist, which one wins is not documented: keep `GEMINI.md` to that one line.
-- **Skills:** `.agents/skills/<name>/SKILL.md`, the folder Quimera always installs. Nothing to mirror. (`--tools=antigravity` is accepted by the installer and adds no extra files; so is `--tools=other` for tools without an adapter.)
-- **Rules:** `.agents/rules/` (the older `.agent/rules/` still works). Quimera does not need it.
+- **Instructions:** Antigravity reads `AGENTS.md` (and `.agents/AGENTS.md`) from version 1.20.5 (2026-03-09) on, besides its own `GEMINI.md`; rules found while walking up from a file combine. On an older version, add a `GEMINI.md` with the line "Read AGENTS.md and follow it."
+- **Skills:** `.agents/skills/<name>/SKILL.md` in the app, the IDE and the CLI (the older `.agent/skills/` still works). This is the folder Quimera always installs: nothing to mirror. (`--tools=antigravity` is accepted by the installer and adds no extra files; so is `--tools=other` for tools without an adapter.)
+- **Rules:** `.agents/rules/*.md`. A rule file without frontmatter holding a valid trigger is dropped without a warning. Quimera does not need rules.
+- **Subagents:** `.agents/agents/<name>.md`. The `model` field takes only `inherit`, `flash` or `pro`, so a subagent can be pinned to a model family but not to a named model.
 
 ## Actions
 
 | Quimera action | Antigravity |
 |---|---|
 | Ask the user | A plain question in the conversation |
-| Dispatch a subagent (tier: …) | A custom agent defined in an `agent.md` file whose `model` field pins it to the tier's model, if your version supports it (custom agents came to the CLI first; the `model` field may take a short alias such as `pro`). Otherwise follow the inline fallback in the `parallel-agents` skill. |
+| Dispatch a subagent (tier: …) | A subagent in `.agents/agents/<name>.md` with `model: pro` for the strongest tier and `model: flash` for the standard and fast tiers. Otherwise follow the inline fallback in the `parallel-agents` skill. |
 | Track progress in a checklist | The task list or plan view, or a checklist in the ledger file |
 | Run a shell command | The terminal tool, in the foreground for every verification |
 
@@ -23,7 +28,7 @@ Use the table in `models.md` for the provider you run (usually Google Gemini), i
 
 ### Session model
 
-Pick the model in the agent panel: the strongest tier while planning and reviewing, the standard tier while building. Switch when the plan is approved, not in the middle of a task.
+Pick the model in the selector under the prompt box (CLI: `/model` or `--model`): the strongest tier while planning and reviewing, the standard tier while building. Switch when the plan is approved, not in the middle of a task.
 
 ## Discreet mode
 

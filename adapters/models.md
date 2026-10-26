@@ -2,7 +2,7 @@
 
 Which real model fills each Quimera tier, for each model provider, in the two model profiles. The tool adapters (`claude-code.md`, `codex.md`, …) say how to call a model in that tool; this file says which model to call. The two are separate because one tool can run another provider's models (for example DeepSeek or MiMo through a launcher that runs Claude Code against their endpoint).
 
-**Checked on 2026-10-22.** Model names change every few months. The project profile's "Models" line wins over this file: when the user names their models at kickoff, use those. When a name below no longer exists, use the provider's current model of the same size and tell the user.
+**Checked on 2026-10-22.** Model names change every few months. The project profile's "Models" line wins over this file: when the user names their models at kickoff, use those. When a name below no longer exists, use the provider's current model of the same size and tell the user. Never move to a costlier model without the user's ok: if no model of the same size is offered, use the next smaller one and say so, or ask.
 
 ## How to read the tables
 
