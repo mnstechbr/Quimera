@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { appendFileSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { KIT_VERSION, copyKit, createRepo } from './helpers/repository.mjs';
+import { KIT_VERSION, copyKit, createRepo, snapshot } from './helpers/repository.mjs';
 
 const SKILL = '.agents/skills/verification/SKILL.md';
 const MIRROR = '.claude/skills/verification/SKILL.md';
@@ -68,4 +68,57 @@ test('a dry run writes nothing', (t) => {
   assert.equal(repo.git('status', '--porcelain', '--untracked-files=all'), '');
   assert.equal(exclude(), before);
   assert.ok(!repo.exists('.git/hooks/commit-msg'));
+});
+
+test('invalid commands and options exit 64, print usage and change nothing', (t) => {
+  const repo = createRepo(t);
+  const cases = [
+    ['updat'],
+    ['init', '--mode=banana'],
+    ['init', '--tools='],
+    ['init', '--tools'],
+    ['init', '--tools=claude,banana'],
+    ['init', '--models'],
+    ['init', '--models=cheap'],
+    ['init', '--unknown'],
+    ['init', 'extra'],
+    ['init', '--dry-run=yes'],
+    ['init', '--mode=discreet', '--mode=open'],
+    ['update', '--mode=discreet'],
+    ['doctor', '--dry-run'],
+  ];
+  const before = snapshot(repo.base);
+  for (const args of cases) {
+    const r = repo.quimera(args);
+    assert.equal(r.status, 64, `${args.join(' ')} exited ${r.status}`);
+    assert.match(r.stderr, /quimera init/, `${args.join(' ')} printed no usage`);
+    assert.equal(r.stdout, '');
+  }
+  assert.deepEqual(snapshot(repo.base), before);
+});
+
+test('help is printed on request and exits 0', (t) => {
+  const repo = createRepo(t);
+  for (const args of [[], ['help'], ['--help']]) {
+    const r = repo.quimera(args);
+    assert.equal(r.status, 0);
+    assert.match(r.stdout, /quimera init[\s\S]*Exit codes/);
+  }
+});
+
+test('outside a git repository the installer exits 2', (t) => {
+  const repo = createRepo(t);
+  assert.equal(repo.quimera(['init'], { cwd: repo.home }).status, 2);
+});
+
+test('a failed setup step makes init exit 1 and says what was and was not done', (t) => {
+  const repo = createRepo(t);
+  repo.write('.git/hooks/commit-msg', '#!/bin/sh\nexit 0\n');
+
+  const r = repo.quimera(['init', '--mode=discreet']);
+  assert.equal(r.status, 1);
+  assert.match(r.stdout, /written: \d+ file/);
+  assert.match(r.stderr, /Not done:[\s\S]*commit-msg guard/);
+  assert.ok(repo.exists('.quimera/manifest.json'));
+  assert.equal(repo.read('.git/hooks/commit-msg'), '#!/bin/sh\nexit 0\n');
 });

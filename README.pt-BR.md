@@ -56,6 +56,8 @@ Depois, abra o seu agente na pasta e diga: *"comece este projeto com a Quimera"*
 
 Mais tarde: `npx github:mnstechbr/Quimera update` atualiza o kit. Arquivos que você editou são mantidos, e a versão nova fica ao lado de cada um como `*.quimera-new`. `npx github:mnstechbr/Quimera doctor` confere a instalação.
 
+Códigos de saída: `0` concluído; `1` algo falhou ou precisa de atenção, e a saída diz o quê (um manifesto inválido ou um caminho inseguro para tudo antes de escrever qualquer coisa); `2` fora de um repositório git; `64` comando ou opção desconhecida, ou valor inválido, sem escrever nada.
+
 O instalador só copia Markdown e scripts pequenos. Ele nunca instala dependências, nunca mexe no seu código e nunca sobrescreve um arquivo que ele não criou.
 
 ## O que entra no seu projeto

@@ -66,6 +66,8 @@ Then open your coding agent in the folder and say: *"start this project with Qui
 
 Later: `npx github:mnstechbr/Quimera update` refreshes the kit. Files you edited are kept, and the new version is saved next to each as `*.quimera-new`. `npx github:mnstechbr/Quimera doctor` checks the setup.
 
+Exit codes: `0` done; `1` something failed or needs attention, and the output says what (an invalid manifest or an unsafe path stops the run before anything is written); `2` not a git repository; `64` an unknown command or option, or an invalid value, with nothing written.
+
 The installer only copies Markdown and small scripts. It never installs dependencies, never touches your code, and never overwrites a file it did not create.
 
 ## What lands in your project

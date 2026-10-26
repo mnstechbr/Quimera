@@ -90,8 +90,8 @@ export function createRepo(t, { branch = 'main', commit = true } = {}) {
       if (r.status !== 0) throw new Error(`git ${args.join(' ')} failed (${r.status}): ${r.stderr}`);
       return r.stdout.trim();
     },
-    // Runs the installer of `kit` (this kit by default) inside the repository.
-    quimera: (args, { kit = KIT } = {}) => run(process.execPath, [join(kit, 'bin', 'quimera.mjs'), ...args], { cwd: root, env }),
+    // Runs the installer of `kit` (this kit by default) inside the repository, or in `cwd`.
+    quimera: (args, { kit = KIT, cwd = root } = {}) => run(process.execPath, [join(kit, 'bin', 'quimera.mjs'), ...args], { cwd, env }),
     manifest: () => JSON.parse(readFileSync(join(root, '.quimera', 'manifest.json'), 'utf8')),
     setManifest: (m) => writeFileSync(join(root, '.quimera', 'manifest.json'), JSON.stringify(m, null, 2)),
     snapshot: () => snapshot(root),

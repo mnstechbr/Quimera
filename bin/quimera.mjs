@@ -5,6 +5,8 @@
 //   quimera update [--models=full|economic] [--dry-run]   refresh kit files; local edits are kept and the new version is saved as *.quimera-new
 //   quimera doctor                 check the installation and run the git preflight
 //
+// Exit codes: 0 done · 1 failed or needs attention · 2 not a git repository · 64 invalid command or option.
+//
 // It only copies Markdown and small Node scripts. It never installs dependencies, never touches
 // your source code, and never overwrites a file it did not create.
 
@@ -27,17 +29,66 @@ const ECONOMIC_AGENTS = {
   default: ['sonnet', 'medium'],
 };
 
-const [command = 'help', ...rest] = process.argv.slice(2);
-const flag = (name) => rest.find((a) => a === `--${name}` || a.startsWith(`--${name}=`));
-// Accepts both --tools=claude and --tools claude.
-const value = (name) => {
-  const f = flag(name);
-  if (!f) return undefined;
-  if (f.includes('=')) return f.split('=').slice(1).join('=');
-  const next = rest[rest.indexOf(f) + 1];
-  return next && !next.startsWith('--') ? next : undefined;
+const MODES = ['discreet', 'open'];
+// The options each command accepts: true takes a value, false is a plain switch.
+const COMMANDS = {
+  init: { tools: true, mode: true, models: true, 'local-only': false, 'dry-run': false },
+  update: { models: true, 'dry-run': false },
+  doctor: {},
 };
-const dryRun = Boolean(flag('dry-run'));
+const HELP = `Quimera ${VERSION}
+  quimera init   [--tools=${TOOLS.join(',')}] [--mode=${MODES.join('|')}] [--models=${PROFILES.join('|')}] [--local-only] [--dry-run]
+  quimera update [--models=${PROFILES.join('|')}] [--dry-run]
+  quimera doctor
+
+Exit codes: 0 done · 1 failed or needs attention (the output says what) · 2 not a git repository · 64 invalid command or option`;
+
+// Invalid usage stops here, before the repository is even looked at.
+function usageError(message) {
+  console.error(`${message}\n\n${HELP}`);
+  process.exit(64);
+}
+
+function parseOptions(command, args) {
+  const allowed = COMMANDS[command];
+  const options = {};
+  for (let i = 0; i < args.length; i++) {
+    const m = args[i].match(/^--([a-z-]+)(?:=([\s\S]*))?$/);
+    if (!m) usageError(`Unexpected argument: ${args[i]}`);
+    const [, name, inline] = m;
+    if (!(name in allowed)) usageError(`quimera ${command} does not take --${name}`);
+    if (name in options) usageError(`--${name} was given twice`);
+    if (!allowed[name]) {
+      if (inline !== undefined) usageError(`--${name} takes no value`);
+      options[name] = true;
+      continue;
+    }
+    // Accepts both --tools=claude and --tools claude.
+    const v = inline ?? (args[i + 1] && !args[i + 1].startsWith('--') ? args[++i] : undefined);
+    if (!v) usageError(`--${name} needs a value`);
+    options[name] = v;
+  }
+  if (options.tools !== undefined) {
+    options.tools = [...new Set(options.tools.split(',').map((t) => t.trim()).filter(Boolean))];
+    const bad = options.tools.filter((t) => !TOOLS.includes(t));
+    if (!options.tools.length) usageError('--tools needs at least one tool');
+    if (bad.length) usageError(`Unknown tool(s): ${bad.join(', ')}. Choose from: ${TOOLS.join(', ')}`);
+  }
+  if (options.mode !== undefined && !MODES.includes(options.mode)) usageError(`Unknown mode: ${options.mode}. Choose from: ${MODES.join(', ')}`);
+  if (options.models !== undefined && !PROFILES.includes(options.models)) {
+    usageError(`Unknown model profile: ${options.models}. Choose from: ${PROFILES.join(', ')}`);
+  }
+  return options;
+}
+
+const [command = 'help', ...rest] = process.argv.slice(2);
+if (['help', '--help', '-h'].includes(command)) {
+  console.log(HELP);
+  process.exit(0);
+}
+if (!(command in COMMANDS)) usageError(`Unknown command: ${command}`);
+const options = parseOptions(command, rest);
+const dryRun = Boolean(options['dry-run']);
 
 function repoRoot() {
   try {
@@ -124,23 +175,8 @@ function install({ update }) {
   }
   const manifest = update ? loadManifest(root) : { files: {} };
 
-  const tools = update
-    ? manifest.tools
-    : (value('tools') ?? 'claude').split(',').map((t) => t.trim()).filter(Boolean);
-  const bad = tools.filter((t) => !TOOLS.includes(t));
-  if (bad.length) {
-    console.error(`Unknown tool(s): ${bad.join(', ')}. Choose from: ${TOOLS.join(', ')}`);
-    process.exit(64);
-  }
-  if (flag('models') && !value('models')) {
-    console.error(`--models needs a value: ${PROFILES.join(' or ')}`);
-    process.exit(64);
-  }
-  const models = value('models') ?? manifest.models ?? 'full';
-  if (!PROFILES.includes(models)) {
-    console.error(`Unknown model profile: ${models}. Choose from: ${PROFILES.join(', ')}`);
-    process.exit(64);
-  }
+  const tools = update ? manifest.tools : (options.tools ?? ['claude']);
+  const models = options.models ?? manifest.models ?? 'full';
 
   const result = { written: [], kept: [], skipped: [], removed: [], orphaned: [] };
   const files = { ...manifest.files };
@@ -224,6 +260,9 @@ function install({ update }) {
     writeFileSync(MANIFEST, JSON.stringify({ version: VERSION, source, tools, models, files }, null, 2) + '\n');
   }
 
+  // Steps after the kit files that did not complete; the kit files themselves stay installed.
+  const notDone = [];
+
   // *.quimera-new files are local review copies: keep them out of commits on this machine.
   if (!dryRun) {
     try {
@@ -234,14 +273,19 @@ function install({ update }) {
         mkdirSync(dirname(ex), { recursive: true });
         appendFileSync(ex, `${cur && !cur.endsWith('\n') ? '\n' : ''}*.quimera-new\n`);
       }
-    } catch {}
+    } catch (e) {
+      notDone.push(`keeping *.quimera-new out of commits (.git/info/exclude): ${e.message.split('\n')[0]}`);
+    }
   }
 
   // Helpers run from this kit, never from the project: a copy there may be old, edited or not ours.
-  const helper = (name) => spawnSync(process.execPath, [join(KIT, 'scripts', name)], { stdio: 'inherit' });
-  const mode = value('mode');
-  if (!update && mode === 'discreet' && !dryRun) helper('install-hooks.mjs');
-  if (!update && flag('local-only') && !dryRun) helper('local-only.mjs');
+  const helper = (step, name) => {
+    const r = spawnSync(process.execPath, [join(KIT, 'scripts', name)], { stdio: 'inherit' });
+    const why = r.error ? `could not start (${r.error.message})` : r.signal ? `stopped by ${r.signal}` : r.status !== 0 ? `exited with ${r.status}` : null;
+    if (why) notDone.push(`${step}: ${why}. After fixing it, run: node .quimera/scripts/${name}`);
+  };
+  if (!update && options.mode === 'discreet' && !dryRun) helper('the discreet-mode commit-msg guard', 'install-hooks.mjs');
+  if (!update && options['local-only'] && !dryRun) helper('the local-only exclusions', 'local-only.mjs');
 
   const n = (a) => a.length;
   console.log(`${dryRun ? '[dry run] ' : ''}Quimera ${VERSION} ${update ? 'updated' : 'installed'} · tools: ${tools.join(', ')} · models: ${models}`);
@@ -258,6 +302,11 @@ function install({ update }) {
     console.log('\nNext: open your coding agent in this folder and say "start this project with Quimera".');
     console.log('It runs the project-kickoff skill: mode, identity, and the memory files, asking you first.');
   }
+  if (notDone.length) {
+    console.error(`\nNot done:\n${notDone.map((s) => `  ${s}`).join('\n')}`);
+    console.error(`The kit files listed above were ${update ? 'updated' : 'installed'}; only these steps are missing.`);
+    process.exit(1);
+  }
 }
 
 function doctor() {
@@ -273,7 +322,8 @@ function doctor() {
   console.log(missing.length ? `missing files:\n${missing.map((f) => `  ${f}`).join('\n')}` : 'all kit files present');
   console.log(existsSync('AGENTS.md') ? 'AGENTS.md present' : 'no AGENTS.md yet: run the project-kickoff skill');
   const r = spawnSync(process.execPath, [join(KIT, 'scripts', 'git-preflight.mjs'), '--no-fetch'], { stdio: 'inherit' });
-  process.exit(missing.length || r.status ? 1 : 0);
+  if (r.error || r.signal) console.error(`The git preflight did not finish: ${r.error?.message ?? `stopped by ${r.signal}`}`);
+  process.exit(missing.length || r.status !== 0 ? 1 : 0);
 }
 
 switch (command) {
@@ -286,9 +336,4 @@ switch (command) {
   case 'doctor':
     doctor();
     break;
-  default:
-    console.log(`Quimera ${VERSION}
-  quimera init   [--tools=claude,codex,copilot,cursor,antigravity,other] [--mode=discreet|open] [--models=full|economic] [--local-only] [--dry-run]
-  quimera update [--models=full|economic] [--dry-run]
-  quimera doctor`);
 }
