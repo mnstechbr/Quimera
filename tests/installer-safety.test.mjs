@@ -33,7 +33,7 @@ function rejects(t, change) {
   assert.deepEqual(snapshot(repo.base), before);
 }
 const entry = (path, hash = digest('sentinel\n')) => (m, repo) => {
-  m.files[typeof path === 'function' ? path(repo) : path] = hash;
+  m.installed.files[typeof path === 'function' ? path(repo) : path] = hash;
 };
 
 test('a manifest path that climbs out of the project is rejected', (t) => {
@@ -61,7 +61,7 @@ test('malformed digests, case duplicates and unknown schemas are rejected', (t) 
     m.schema = 99;
   });
   rejects(t, (m) => {
-    m.tools = ['claude', 'banana'];
+    m.desired.tools = ['claude', 'banana'];
   });
 });
 

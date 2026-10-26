@@ -15,12 +15,13 @@ test('init installs the kit and records a digest for every file it wrote', (t) =
   assert.equal(r.status, 0, r.stderr);
 
   const m = repo.manifest();
-  assert.equal(m.version, KIT_VERSION);
-  assert.deepEqual(m.tools, ['claude']);
+  assert.equal(m.schema, 2);
+  assert.equal(m.installed.version, KIT_VERSION);
+  assert.deepEqual(m.desired.tools, ['claude']);
   for (const f of ['.quimera/QUIMERA.md', SKILL, MIRROR, '.claude/agents/quimera-reviewer.md', 'CLAUDE.md']) {
-    assert.ok(f in m.files, `${f} missing from the manifest`);
+    assert.ok(f in m.installed.files, `${f} missing from the manifest`);
   }
-  for (const [f, digest] of Object.entries(m.files)) {
+  for (const [f, digest] of Object.entries(m.installed.files)) {
     assert.ok(repo.exists(f), `${f} not written`);
     assert.equal(repo.sha(f), digest, `${f} does not match its digest`);
   }
@@ -53,7 +54,7 @@ test('update keeps a local edit and offers the new kit version beside it', (t) =
   assert.equal(repo.read(`${SKILL}.quimera-new`), upstream);
   // The untouched mirror of the same skill takes the new version directly.
   assert.equal(repo.read(MIRROR), upstream);
-  assert.equal(repo.manifest().files[MIRROR], repo.sha(MIRROR));
+  assert.equal(repo.manifest().installed.files[MIRROR], repo.sha(MIRROR));
 });
 
 test('a dry run writes nothing', (t) => {

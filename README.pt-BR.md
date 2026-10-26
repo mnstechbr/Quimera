@@ -49,12 +49,13 @@ npx github:mnstechbr/Quimera init --tools=claude
 - `--tools`: qualquer combinação de `claude,codex,copilot,cursor,antigravity,other` (padrão `claude`).
 - `--mode=discreet` instala a trava dos commits.
 - `--models=economic` deixa os agentes do Claude Code no perfil econômico (padrão `full`). Para trocar depois: `update --models=…`.
+- `--specialists=security,database,interface` (ou `none`) instala só os agentes revisores especialistas que o projeto usa (padrão: os três).
 - `--local-only` deixa os arquivos da Quimera e a memória do projeto fora do git, só na sua máquina. Use em repositório da empresa.
-- `--dry-run` mostra o que seria escrito, sem escrever.
+- `--dry-run` lista cada mudança que seria feita, sem fazer nenhuma.
 
 Depois, abra o seu agente na pasta e diga: *"comece este projeto com a Quimera"*. A skill `project-kickoff` pergunta o modo, a identidade e o público antes de criar qualquer coisa.
 
-Mais tarde: `npx github:mnstechbr/Quimera update` atualiza o kit. Arquivos que você editou são mantidos, e a versão nova fica ao lado de cada um como `*.quimera-new`. `npx github:mnstechbr/Quimera doctor` confere a instalação.
+Mais tarde: `npx github:mnstechbr/Quimera update` atualiza o kit; ele também aceita `--tools`, `--models` e `--specialists` para mudar a configuração. Arquivos que você editou são mantidos, e a versão nova fica ao lado de cada um como `*.quimera-new`. `npx github:mnstechbr/Quimera doctor` confere a instalação e depois o estado do git, sem mudar nada (`--json` para um relatório). O que fazer quando um update é interrompido: [docs/update-recovery.md](docs/update-recovery.md) (em inglês).
 
 Códigos de saída: `0` concluído; `1` algo falhou ou precisa de atenção, e a saída diz o quê (um manifesto inválido ou um caminho inseguro para tudo antes de escrever qualquer coisa); `2` fora de um repositório git; `64` comando ou opção desconhecida, ou valor inválido, sem escrever nada.
 

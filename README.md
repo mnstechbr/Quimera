@@ -59,12 +59,13 @@ npx github:mnstechbr/Quimera init --tools=claude
 - `--tools`: any of `claude,codex,copilot,cursor,antigravity,other` (default `claude`).
 - `--mode=discreet` installs the commit guard.
 - `--models=economic` sets the Claude Code role agents to the economic profile (default `full`). Switch later with `update --models=…`.
+- `--specialists=security,database,interface` (or `none`) installs only the specialist reviewer agents the project uses (default: all three).
 - `--local-only` keeps the Quimera files and the project memory out of git, on your machine only. Use it in an employer's repository.
-- `--dry-run` shows what would be written.
+- `--dry-run` prints every change the run would make, and makes none.
 
 Then open your coding agent in the folder and say: *"start this project with Quimera"*. The `project-kickoff` skill asks for the mode, the identity and the audience before creating anything.
 
-Later: `npx github:mnstechbr/Quimera update` refreshes the kit. Files you edited are kept, and the new version is saved next to each as `*.quimera-new`. `npx github:mnstechbr/Quimera doctor` checks the setup.
+Later: `npx github:mnstechbr/Quimera update` refreshes the kit; it also takes `--tools`, `--models` and `--specialists` to change the setup. Files you edited are kept, and the new version is saved next to each as `*.quimera-new`. `npx github:mnstechbr/Quimera doctor` checks the installation and then the git state, and changes nothing (`--json` for a report). What to do when an update is interrupted: [docs/update-recovery.md](docs/update-recovery.md).
 
 Exit codes: `0` done; `1` something failed or needs attention, and the output says what (an invalid manifest or an unsafe path stops the run before anything is written); `2` not a git repository; `64` an unknown command or option, or an invalid value, with nothing written.
 

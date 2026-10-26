@@ -49,7 +49,9 @@ export function diskProblem(root, rel, { own }) {
     if (st.isSymbolicLink()) return `${where}: is a symbolic link; Quimera only writes into real folders inside the project`;
     if (!st.isDirectory()) return `${where}: is a file where a folder is expected`;
   }
-  if (own && lstat(join(root, rel))?.isSymbolicLink()) return `${rel}: is a symbolic link; Quimera never writes through one`;
+  const target = own ? lstat(join(root, rel)) : null;
+  if (target?.isSymbolicLink()) return `${rel}: is a symbolic link; Quimera never writes through one`;
+  if (target?.isDirectory()) return `${rel}: is a folder where a file is expected`;
   return null;
 }
 
