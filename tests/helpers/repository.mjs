@@ -17,7 +17,7 @@ export const KIT_VERSION = JSON.parse(readFileSync(join(KIT, 'package.json'), 'u
 export const IDENTITY = { name: 'Fixture Owner', email: 'owner@fixture.test' };
 
 // What a copy of the kit needs to run the installer: the parts `package.json` publishes.
-const KIT_PARTS = ['bin', 'skills', 'scripts', 'adapters', 'templates', 'QUIMERA.md', 'NOTICE.md', 'LICENSE', 'package.json'];
+const KIT_PARTS = ['bin', 'skills', 'scripts', 'adapters', 'templates', 'QUIMERA.md', 'NOTICE.md', 'LICENSE', 'CHANGELOG.md', 'package.json'];
 
 function isolatedEnv(home) {
   // Inherited GIT_* variables (GIT_DIR, GIT_INDEX_FILE, …) would point Git at another repository.

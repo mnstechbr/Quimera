@@ -156,6 +156,8 @@ function plan(tools, specialists) {
   const pairs = [];
   const add = (src, dest) => pairs.push([src, dest.split(sep).join('/')]);
   add(join(KIT, 'QUIMERA.md'), '.quimera/QUIMERA.md');
+  // The skills adapt MIT-licensed work: the notices travel with them, and so does what changed.
+  for (const f of ['NOTICE.md', 'LICENSE', 'CHANGELOG.md']) add(join(KIT, f), `.quimera/${f}`);
   for (const dir of ['scripts', 'adapters', 'templates']) {
     for (const f of walk(join(KIT, dir))) {
       if (dir === 'templates' && relative(KIT, f).startsWith(join('templates', 'claude'))) continue;
@@ -416,6 +418,7 @@ function install({ update }) {
   if (hook !== old?.hook) saveManifest();
 
   console.log(`Quimera ${VERSION} ${update ? 'updated' : 'installed'} · ${setup}`);
+  if (update && old.installed.version !== VERSION) console.log(`  version: ${old.installed.version} → ${VERSION}; what changed is in .quimera/CHANGELOG.md`);
   console.log(`  written: ${n(result.written)} file(s)`);
   if (n(result.kept)) console.log(`  kept your edits in ${n(result.kept)} file(s); the new version is next to each as *.quimera-new:\n${result.kept.map((f) => `    ${f}`).join('\n')}`);
   if (n(result.removed)) console.log(`  removed ${n(result.removed)} file(s) the kit no longer ships`);

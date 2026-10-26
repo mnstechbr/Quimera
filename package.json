@@ -1,7 +1,7 @@
 {
   "name": "quimera-kit",
   "version": "0.3.0",
-  "description": "An AI-agent development standard built from the best parts of proven open-source projects. Works with any tool.",
+  "description": "A small, local-first development standard for one owner working with several AI coding tools: decisions live in the repository, the git history stays yours, and nothing counts as done without evidence.",
   "license": "MIT",
   "author": "Jean Vitor <mnstechbr@outlook.com>",
   "type": "module",
@@ -19,7 +19,9 @@
     "scripts",
     "adapters",
     "templates",
-    "NOTICE.md"
+    "NOTICE.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "engines": {
     "node": ">=20"
