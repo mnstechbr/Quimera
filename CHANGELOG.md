@@ -30,7 +30,7 @@ The method now runs after kickoff, the scripts never report success without evid
 
 - Manifest schema 2 (desired setup, installed digests, pending offers and orphans, hook), a lock against concurrent runs and a journal that makes an interrupted run resumable. `update --tools` and `--specialists`; `doctor --json`; `verify.mjs --json`.
 - `.quimera/checks.json`: the project's own check commands, for any stack.
-- `memory.mjs`: a private history of local-only memory in `.quimera/memory.git`, with no remote.
+- `memory.mjs`: a private history of local-only memory in `.git/quimera-memory.git`, with no remote.
 - A six-step working loop in the `AGENTS.md` template, kept in the one file every tool loads; skill triggers for each request, each phase end and each delivery.
 - Kickoff asks first how technical the owner is and how much to explain, records the product type, and creates the default branch with the first commit. `close-task` integrates finished work locally when there is no remote.
 - `vision-review` category sets per product type (games, visual showcases, products with accounts, libraries); `design-directions` starts from the owner's references and real assets.

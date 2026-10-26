@@ -29,7 +29,7 @@ When this file and the project's `AGENTS.md` disagree, `AGENTS.md` wins: it hold
 - **Owner.** How technical the owner is, who decides technical choices (the agent, explaining briefly, or the owner, after the options), and coaching or concise. Lessons learned about how the owner works go in the `AGENTS.md` section "Working with the owner".
 - **Product type.** Web app or SaaS, landing page or visual showcase, game, mobile app, library or command-line tool, API, or other. Reviews ask the questions that fit it.
 - **Identity.** The git name and email for this project. Check them before the first commit of every session (`task-start`), because git identity is per machine and the user works on more than one computer.
-- **Quimera files.** `committed` (kit and memory files live in the repository) or `local-only` (kept on the user's machine through `.git/info/exclude`, never pushed, with an optional private history in `.quimera/memory.git`). Local-only is for repositories that belong to someone else; the user's own projects commit their memory.
+- **Quimera files.** `committed` (kit and memory files live in the repository) or `local-only` (kept on the user's machine through `.git/info/exclude`, never pushed, with an optional private history in `.git/quimera-memory.git`). Local-only is for repositories that belong to someone else; the user's own projects commit their memory.
 - **Specialist reviewers.** Which specialists `code-review` may add (security, database, interface), or `off`.
 - **Models.** The providers or exact models the user works with, and the model profile, `full` or `economic` (see "Model profile").
 

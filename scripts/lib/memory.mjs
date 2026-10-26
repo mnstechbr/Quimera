@@ -4,7 +4,8 @@
 // The pilots kept working for hours while STATE.md stayed days behind, and nothing said so.
 // Each problem is one line that names the file and what to do.
 
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, statSync } from 'node:fs';
+import { readSmall } from './files.mjs';
 import { memoryPaths } from './local-files.mjs';
 
 export const MAX_LINES = 60;
@@ -19,7 +20,8 @@ export function memoryProblems({ git, branch, file = memoryPaths('.').state }) {
   if (!existsSync(file)) return [];
   const lastCommit = git(['log', '-1', '--format=%cI']);
   if (!lastCommit) return []; // no commits yet: nothing to compare with
-  const text = readFileSync(file, 'utf8');
+  const text = readSmall(file);
+  if (text === null) return [`${file} is not a regular file inside the project of a readable size: check it by hand`];
   const out = [];
 
   // Commits since the file last changed: from git when it is tracked, from its modification time

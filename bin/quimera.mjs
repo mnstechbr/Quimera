@@ -32,6 +32,7 @@ import { fileURLToPath } from 'node:url';
 import { MODES, PROFILES, SPECIALISTS, TOOLS, readManifest, writeManifest } from './lib/manifest.mjs';
 import { diskProblem, present } from './lib/paths.mjs';
 import { digest as digestOf, guardState, lf } from '../scripts/lib/guard.mjs';
+import { readSmall } from '../scripts/lib/files.mjs';
 
 const KIT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const VERSION = JSON.parse(readFileSync(join(KIT, 'package.json'), 'utf8')).version;
@@ -402,7 +403,8 @@ function install({ update }) {
     const nextGuard = lf(readFileSync(join(KIT, 'scripts', 'commit-msg'), 'utf8'));
     const state = guardState(readFileSync(hookFile, 'utf8'), nextGuard, old?.hook?.digest ?? null);
     const common = execFileSync('git', ['rev-parse', '--git-common-dir'], { encoding: 'utf8' }).trim();
-    const inGitDir = !relative(isAbsolute(common) ? common : join(root, common), hookFile).startsWith('..');
+    const fromCommon = relative(isAbsolute(common) ? common : join(root, common), hookFile);
+    const inGitDir = !fromCommon.startsWith('..') && !isAbsolute(fromCommon);
     if (state === 'upgrade' && inGitDir) {
       writeFileSync(hookFile, nextGuard);
       chmodSync(hookFile, 0o755);
@@ -426,8 +428,8 @@ function install({ update }) {
   if (n(result.skipped)) console.log(`  left untouched (not created by Quimera):\n${result.skipped.map((f) => `    ${f}`).join('\n')}`);
   for (const x of notes) console.log(`  note: ${x}`);
   if (result.skipped.includes('CLAUDE.md') && existsSync('CLAUDE.md')) {
-    const text = readFileSync('CLAUDE.md', 'utf8');
-    if (!/^@AGENTS\.md\s*$/m.test(text)) console.log('  note: your CLAUDE.md does not import AGENTS.md, so Claude Code will not read it. Add a line "@AGENTS.md".');
+    const text = readSmall('CLAUDE.md') ?? '';
+    if (!/^@AGENTS\.md[ \t]*$/m.test(text)) console.log('  note: your CLAUDE.md does not import AGENTS.md, so Claude Code will not read it. Add a line "@AGENTS.md".');
   }
   if (!update) {
     console.log('\nNext: open your coding agent in this folder and say "start this project with Quimera".');
@@ -442,16 +444,18 @@ function install({ update }) {
 
 // The project profile's mode and Quimera-files lines, from .quimera/PROFILE.md or AGENTS.md.
 function readProfile() {
-  const file = ['.quimera/PROFILE.md', 'AGENTS.md'].find((f) => existsSync(f) && /\*\*Git identity:\*\*/i.test(readFileSync(f, 'utf8')));
+  const file = ['.quimera/PROFILE.md', 'AGENTS.md'].find((f) => /\*\*Git identity:\*\*/i.test(readSmall(f) ?? ''));
   if (!file) return { file: null, mode: null, localOnly: null };
-  const text = readFileSync(file, 'utf8');
-  const field = (label) => text.match(new RegExp(`\\*\\*${label}:\\*\\*\\s*(.+)`, 'i'))?.[1]?.trim().toLowerCase();
+  const text = readSmall(file);
+  const field = (label) => text.match(new RegExp(`\\*\\*${label}:\\*\\*[ \\t]*([^\\n]+)`, 'i'))?.[1]?.trim().toLowerCase();
   const files = field('Quimera files');
   return { file, mode: field('Mode')?.match(/^(discreet|open)\b/)?.[1] ?? null, localOnly: files ? files.startsWith('local-only') : null };
 }
 
 // Read-only. Installation health decides the exit code; work readiness is reported beside it.
 function doctor() {
+  // Read-only: git status checks never take the index lock while the owner commits.
+  process.env.GIT_OPTIONAL_LOCKS = '0';
   const root = repoRoot();
   process.chdir(root);
   if (!present(MANIFEST)) {
@@ -478,7 +482,7 @@ function doctor() {
   for (const p of Object.keys(files)) {
     const mirror = p.match(/^\.(claude|github|cursor)\/skills\/(.+)$/);
     const canonical = mirror && `.agents/skills/${mirror[2]}`;
-    if (canonical && present(p) && present(canonical) && !diskProblem(root, p, { own: true }) && sha(p) !== sha(canonical)) {
+    if (canonical && present(p) && present(canonical) && !diskProblem(root, p, { own: true }) && !diskProblem(root, canonical, { own: true }) && sha(p) !== sha(canonical)) {
       problem('diverged', p, `differs from ${canonical}: tools would read different versions of this skill`);
     }
   }
@@ -504,7 +508,7 @@ function doctor() {
     const ignored = spawnSync('git', ['check-ignore', '-q', '.quimera/QUIMERA.md']).status === 0;
     if (!ignored) problem('local-only', null, 'Quimera files should be local-only, but .quimera/ is not excluded from git: run node .quimera/scripts/local-only.mjs');
     // Local-only memory exists only on this disk unless it has its own history.
-    if (!existsSync('.quimera/memory.git')) {
+    if (!existsSync(gitPath('quimera-memory.git'))) {
       note('memory', null, 'local-only memory has no history and no copy: node .quimera/scripts/memory.mjs init keeps one in a private repository on this machine');
     } else if (/Not saved yet/.test(spawnSync(process.execPath, [join(KIT, 'scripts', 'memory.mjs'), 'status'], { encoding: 'utf8' }).stdout ?? '')) {
       note('memory', null, 'memory changes are not saved yet: node .quimera/scripts/memory.mjs save');

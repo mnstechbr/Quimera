@@ -75,7 +75,7 @@ The installer only copies Markdown and small scripts. It never installs dependen
 ```
 AGENTS.md                 project profile, working loop, stack, rules (created by the kickoff, read by every tool)
 .quimera/                 QUIMERA.md, scripts, tool adapters, templates, NOTICE.md, LICENSE, CHANGELOG.md
-                          (and, if you create them: checks.json, PROFILE.md, memory.git)
+                          (and, if you create them: checks.json, PROFILE.md; the private memory history lives in .git/quimera-memory.git)
 .agents/skills/           the skills (mirrored to .claude/skills, .github/skills or .cursor/skills per tool)
 docs/STATE.md · MAP.md · VISION.md · DECISIONS.md · standards/   project memory
 ```

@@ -7,25 +7,7 @@
 import { lstatSync } from 'node:fs';
 import { join } from 'node:path';
 
-// Folders and files the installer may create, update or remove. Paths use forward slashes.
-export const MANAGED_DIRS = ['.quimera/', '.agents/skills/', '.claude/skills/', '.claude/agents/', '.github/skills/', '.cursor/skills/'];
-export const MANAGED_FILES = ['CLAUDE.md', '.github/copilot-instructions.md'];
-// Files inside managed folders that belong to the project, never to the manifest.
-const PROJECT_FILES = ['.quimera/PROFILE.md', '.quimera/manifest.json', '.quimera/checks.json'];
-
-// Why `p` can never be a managed path, or null when it can.
-export function pathProblem(p) {
-  if (typeof p !== 'string' || !p) return 'empty path';
-  // Backslashes, colons (drive letters, Windows streams) and absolute paths could leave the project.
-  if (/[\\:\0]/.test(p) || p.startsWith('/')) return 'not a relative path with forward slashes';
-  const parts = p.split('/');
-  // Windows drops a trailing dot or space, so ".. " would climb like "..".
-  if (parts.some((s) => s === '' || s === '.' || s === '..' || /[. ]$/.test(s))) return 'has an empty, "." or ".." segment';
-  if (parts.some((s) => s.toLowerCase() === '.git')) return 'points into git metadata';
-  if (PROJECT_FILES.includes(p) || p.startsWith('.quimera/memory.git/')) return 'belongs to the project, not to the kit';
-  if (!MANAGED_FILES.includes(p) && !MANAGED_DIRS.some((d) => p.startsWith(d))) return 'is outside the folders Quimera manages';
-  return null;
-}
+export { MANAGED_DIRS, MANAGED_FILES, pathProblem } from '../../scripts/lib/managed.mjs';
 
 const lstat = (p) => {
   try {

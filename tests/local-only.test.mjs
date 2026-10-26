@@ -96,7 +96,7 @@ test('the private memory repository keeps a history of the memory files', (t) =>
   const init = script(repo, 'memory.mjs', ['init']);
   assert.equal(init.status, 0, init.stderr);
 
-  const mem = (...args) => repo.git('--git-dir=.quimera/memory.git', `--work-tree=${repo.root}`, ...args);
+  const mem = (...args) => repo.git('--git-dir=.git/quimera-memory.git', `--work-tree=${repo.root}`, ...args);
   assert.deepEqual(mem('ls-files').split('\n').sort(), ['CLAUDE.md', 'docs/DECISIONS.md', 'docs/STATE.md']);
   repo.write('docs/STATE.md', '# State\n\nSecond.\n');
   assert.equal(script(repo, 'memory.mjs', ['save', '-m', 'docs: record second state']).status, 0);
@@ -112,7 +112,7 @@ test('the memory repository refuses to live where the project would commit it', 
   const r = script(repo, 'memory.mjs', ['init']);
   assert.equal(r.status, 1);
   assert.match(r.stderr, /local-only/);
-  assert.ok(!repo.exists('.quimera/memory.git'));
+  assert.ok(!repo.exists('.git/quimera-memory.git'));
 });
 
 test('doctor notes local-only memory without a history', (t) => {

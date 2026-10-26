@@ -1,7 +1,7 @@
 // Quimera · which files are project memory and which are product documents, for local-only
 // projects. Shared by local-only.mjs, memory.mjs and the installer's doctor. Read-only.
 
-import { existsSync, readFileSync } from 'node:fs';
+import { readSmall } from './files.mjs';
 import { join, posix } from 'node:path';
 
 export const MEMORY_FILES = [
@@ -21,12 +21,12 @@ export const PRODUCT_DOCS = ['docs/vision/', 'docs/studies/', 'docs/plans/', 'do
 // (for example: state `memory/CURRENT.md` · map `docs/MAP.md` · decisions `docs/DECISIONS.md`).
 export function memoryPaths(root) {
   const paths = { state: 'docs/STATE.md', map: 'docs/MAP.md', decisions: 'docs/DECISIONS.md' };
-  const profile = ['.quimera/PROFILE.md', 'AGENTS.md'].map((f) => join(root, f)).find((f) => existsSync(f));
-  const line = profile ? readFileSync(profile, 'utf8').match(/\*\*Memory:\*\*\s*(.+)/i)?.[1] : null;
+  const text = ['.quimera/PROFILE.md', 'AGENTS.md'].map((f) => readSmall(join(root, f), { root })).find((t) => t !== null);
+  const line = text?.match(/\*\*Memory:\*\*[ \t]*([^\n]+)/i)?.[1];
   for (const key of Object.keys(paths)) {
     const p = line?.match(new RegExp(`${key}\\s+\`([^\`]+)\``, 'i'))?.[1];
-    // Only a plain relative path inside the project counts.
-    if (p && /^[\w.@+-][\w./@+ -]*$/.test(p) && !p.split('/').includes('..')) paths[key] = posix.normalize(p);
+    // Only a Markdown file inside the project counts: no folder, no git metadata, nothing that climbs.
+    if (p && /^[\w.@+][\w./@+ -]*\.md$/i.test(p) && !p.split('/').some((s) => s === '..' || s.toLowerCase() === '.git')) paths[key] = posix.normalize(p);
   }
   return paths;
 }
@@ -37,9 +37,8 @@ export const LEDGERS = 'docs/plans/*.ledger.md';
 // The standards that docs/standards/INDEX.md points to (code-standards writes them), as
 // `docs/standards/…` paths or relative Markdown links. Nothing outside docs/standards/ counts.
 export function standardsFiles(root) {
-  const index = join(root, 'docs', 'standards', 'INDEX.md');
-  if (!existsSync(index)) return [];
-  const text = readFileSync(index, 'utf8');
+  const text = readSmall(join(root, 'docs', 'standards', 'INDEX.md'), { root });
+  if (text === null) return [];
   const found = new Set();
   for (const [, p] of text.matchAll(/(docs\/standards\/[\w./-]+\.md)/g)) found.add(posix.normalize(p));
   for (const [, p] of text.matchAll(/\]\(([\w./-]+\.md)\)/g)) found.add(p.startsWith('docs/') ? posix.normalize(p) : posix.join('docs/standards', p));

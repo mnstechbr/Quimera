@@ -7,8 +7,9 @@
 //
 // In local-only mode the memory files (docs/STATE.md, DECISIONS.md, …) are kept out of the
 // project's git, so without this they have no history and no copy. This keeps a separate git
-// repository in .quimera/memory.git (excluded with the rest of .quimera/) that tracks only those
-// files, in place. It never creates a remote and never pushes: to keep a copy elsewhere, the owner
+// repository in the project's git folder (.git/quimera-memory.git) that tracks only those files, in
+// place. It lives there because a clone never carries that folder: a memory repository inside the
+// working tree could arrive with a hostile configuration that git would obey. It never creates a remote and never pushes: to keep a copy elsewhere, the owner
 // adds a private remote and pushes it by hand. Exit 0 done · 1 failed · 2 not a git repository · 64 bad usage.
 
 import { execFileSync, spawnSync } from 'node:child_process';
@@ -32,14 +33,24 @@ try {
   process.exit(2);
 }
 process.chdir(root);
-const MEMORY = join(root, '.quimera', 'memory.git');
+// Status checks must not take git's index lock while the owner commits.
+process.env.GIT_OPTIONAL_LOCKS = '0';
+const gitPath = (name) => {
+  const p = git(['rev-parse', '--git-path', name]);
+  return isAbsolute(p) ? p : join(root, p);
+};
+const MEMORY = gitPath('quimera-memory.git');
 const mem = (args) => git(['--git-dir', MEMORY, '--work-tree', root, ...args]);
+
+// The block local-only.mjs keeps in .git/info/exclude, or null when the project is not local-only.
+function localOnlyBlock() {
+  const exclude = gitPath('info/exclude');
+  return existsSync(exclude) ? splitExclude(readFileSync(exclude, 'utf8')).block : null;
+}
 
 // The memory files, plus the product documents when this project excludes them too.
 function paths() {
-  let exclude = git(['rev-parse', '--git-path', 'info/exclude']);
-  if (!isAbsolute(exclude)) exclude = join(root, exclude);
-  const block = existsSync(exclude) ? splitExclude(readFileSync(exclude, 'utf8')).block : null;
+  const block = localOnlyBlock();
   const docs = block?.includes('/docs/plans/') ? PRODUCT_DOCS : [];
   const tracked = existsSync(MEMORY) ? mem(['ls-files']).split('\n').filter(Boolean) : [];
   // Only what exists now, or what was saved before (so a deletion is recorded too).
@@ -64,12 +75,12 @@ function save(text) {
 try {
   if (command === 'init') {
     if (existsSync(MEMORY)) {
-      console.log('The memory repository already exists: .quimera/memory.git');
+      console.log(`The memory repository already exists: ${MEMORY}`);
       process.exit(0);
     }
-    // Inside a committed .quimera/ the repository would be pushed with the project: refuse.
-    if (spawnSync('git', ['check-ignore', '-q', '--no-index', '.quimera/memory.git/HEAD']).status !== 0) {
-      console.error('The memory repository is for local-only projects, and .quimera/ is not excluded here.');
+    // Committed projects keep their memory in the project's own history.
+    if (!localOnlyBlock()) {
+      console.error('The memory repository is for local-only projects, and this one is not local-only.');
       console.error('Committed projects already keep their memory in the project history. For local-only, run node .quimera/scripts/local-only.mjs first.');
       process.exit(1);
     }
@@ -88,7 +99,7 @@ try {
       rmSync(MEMORY, { recursive: true, force: true }); // never leave half a repository behind
       throw e;
     }
-    console.log('Memory repository: .quimera/memory.git (no remote; add a private one by hand if you want a copy elsewhere).');
+    console.log(`Memory repository: ${MEMORY} (no remote; add a private one by hand if you want a copy elsewhere).`);
   } else if (!existsSync(MEMORY)) {
     console.error('No memory repository yet: run node .quimera/scripts/memory.mjs init');
     process.exit(1);

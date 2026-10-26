@@ -13,6 +13,8 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, join } from 'node:path';
+import { readSmall } from './lib/files.mjs';
+import { pathProblem } from './lib/managed.mjs';
 import { BLOCK_BEGIN, BLOCK_END, LEDGERS, MEMORY_FILES, PRODUCT_DOCS, memoryPaths, splitExclude, standardsFiles } from './lib/local-files.mjs';
 
 // What Quimera 0.3.0 appended: whole folders, which also hid the project's own files.
@@ -48,7 +50,7 @@ let kitFiles = [];
 const manifestFile = join(root, '.quimera', 'manifest.json');
 if (existsSync(manifestFile)) {
   try {
-    const m = JSON.parse(readFileSync(manifestFile, 'utf8'));
+    const m = JSON.parse(readSmall(manifestFile, { root, max: 4 * 1024 * 1024 }) ?? '');
     kitFiles = Object.keys(m.installed?.files ?? m.files ?? {});
   } catch {
     console.error('.quimera/manifest.json is not valid JSON: only the memory files are excluded. Run "quimera doctor".');
@@ -56,8 +58,9 @@ if (existsSync(manifestFile)) {
 } else {
   console.error('No .quimera/manifest.json yet: only .quimera/ and the memory files are excluded. Run this again after "quimera init".');
 }
-// A path that is also a valid pattern: no glob characters, no negation, nothing climbing out.
-const plain = (p) => typeof p === 'string' && /^[\w.@+-][\w./@+ -]*$/.test(p) && !p.split('/').includes('..');
+// A kit path that is also a valid pattern: inside the managed folders (the installer's own rule), with
+// no glob characters and no negation. Anything else in a manifest would hide the project's files.
+const plain = (p) => !pathProblem(p) && /^[\w.@+-][\w./@+ -]*$/.test(p);
 
 const current = existsSync(exclude) ? readFileSync(exclude, 'utf8') : '';
 let { outside, block } = splitExclude(current);

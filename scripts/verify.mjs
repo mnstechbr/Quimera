@@ -20,7 +20,7 @@
 // · 64 unknown option. Full output of each step goes to a log file outside the project.
 
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, isAbsolute, join } from 'node:path';
 import { memoryProblems } from './lib/memory.mjs';
@@ -46,6 +46,9 @@ const setupError = (message) => {
   console.error(message);
   process.exit(2);
 };
+
+// Read-only git calls never take the index lock while the owner commits.
+process.env.GIT_OPTIONAL_LOCKS = '0';
 
 const tryGit = (a) => {
   try {
@@ -202,9 +205,15 @@ function fullPlan() {
   else unverified('test', 'no "test" script in package.json; if the project has no tests, declare checks with "skip" and the reason');
 }
 
+// On Windows the tools run through cmd.exe, which would read these characters in a file name as
+// commands. Such files are left to a check run by hand.
+const CMD_UNSAFE = 'a changed file name holds characters cmd.exe would interpret (& | < > ^ % ! " ( )): run this check by hand';
+const cmdUnsafe = (names) => process.platform === 'win32' && names.some((f) => /[&|<>^%!"()]/.test(f));
+
 function changedPlan() {
   const eslint = bin('eslint');
   if (!js.length) notApplicable('lint', 'no JavaScript or TypeScript changed');
+  else if (cmdUnsafe(js)) unverified('lint', CMD_UNSAFE);
   else if (eslint) runStep(`lint (${js.length} file${s(js.length)})`, [eslint, '--no-warn-ignored', ...js]);
   else if (filesArg) notApplicable('lint', COORDINATOR);
   else if (scripts.lint) runStep('lint', runScript('lint'));
@@ -221,6 +230,7 @@ function changedPlan() {
   const vitest = bin('vitest');
   const jest = bin('jest');
   if (!sources.length && !tests.length) notApplicable('tests', 'no source or test files changed');
+  else if (cmdUnsafe([...sources, ...tests]) && (vitest || jest)) unverified('tests', CMD_UNSAFE);
   else if (vitest) {
     if (tests.length) runStep(`changed tests (${tests.length})`, [vitest, 'run', '--passWithNoTests', ...tests], { tests: true });
     if (sources.length) runStep(`related tests (${sources.length} source${s(sources.length)})`, [vitest, 'related', '--run', '--passWithNoTests', ...sources], { tests: true });
@@ -289,7 +299,9 @@ if (planOnly) {
 
 // ---------- run (always in the foreground) ----------
 // One folder per run: parallel agents must not overwrite each other's logs.
-const logDir = join(tmpdir(), `quimera-verify-${basename(root)}-${process.pid}`);
+// A private folder of its own (mode 0700, random name), created on the first step that runs: logs
+// never go to a predictable shared path another user could prepare.
+let logDir = null;
 let failed = false;
 steps.forEach((st, i) => {
   if (!st.cmd) return;
@@ -297,7 +309,7 @@ steps.forEach((st, i) => {
     Object.assign(st, { status: 'unverified', reason: 'an earlier step failed' });
     return;
   }
-  mkdirSync(logDir, { recursive: true });
+  logDir ??= mkdtempSync(join(tmpdir(), `quimera-verify-${basename(root).replace(/[^\w-]+/g, '_')}-`));
   const start = Date.now();
   const r = spawnSync(st.cmd[0], st.cmd.slice(1), {
     cwd: join(root, st.cwd ?? '.'),
@@ -309,7 +321,7 @@ steps.forEach((st, i) => {
   const exit = r.status ?? 1;
   const out = `${r.stdout ?? ''}${r.stderr ?? ''}${r.error ? `\n${r.error.message}` : ''}${r.signal ? `\nstopped by ${r.signal}` : ''}`;
   const log = join(logDir, `${String(i + 1).padStart(2, '0')}-${st.name.replace(/[^\w-]+/g, '_')}.log`);
-  writeFileSync(log, `$ ${st.cmd.join(' ')}\n${out}\nexit=${exit}\n`);
+  writeFileSync(log, `$ ${st.cmd.join(' ')}\n${out}\nexit=${exit}\n`, { flag: 'wx', mode: 0o600 });
   Object.assign(st, { exit, log, seconds: Number(((Date.now() - start) / 1000).toFixed(1)) });
 
   if (exit === 0 && !r.error && !r.signal) {

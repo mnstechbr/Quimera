@@ -11,6 +11,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { readSmall } from './lib/files.mjs';
 import { memoryProblems } from './lib/memory.mjs';
 
 const args = process.argv.slice(2);
@@ -21,6 +22,8 @@ if (unknown) {
 }
 // --no-fetch is the default now; it is still accepted from skills installed by Quimera 0.3.0.
 const fetch = args.includes('--fetch') && !args.includes('--no-fetch');
+// Read-only: never take git's index lock while the owner commits.
+process.env.GIT_OPTIONAL_LOCKS = '0';
 
 const run = (args, trim = true) => {
   try {
@@ -52,13 +55,13 @@ const info = (m) => notes.push(`·         ${m}`);
 // ---------- project profile ----------
 // .quimera/PROFILE.md wins (used when AGENTS.md cannot be edited, e.g. a tracked file in an employer repo).
 let profile = {};
-const profileFile = ['.quimera/PROFILE.md', 'AGENTS.md'].find((f) => existsSync(f) && /\*\*Git identity:\*\*/i.test(readFileSync(f, 'utf8')));
+const profileFile = ['.quimera/PROFILE.md', 'AGENTS.md'].find((f) => /\*\*Git identity:\*\*/i.test(readSmall(f) ?? ''));
 if (profileFile) {
-  const text = readFileSync(profileFile, 'utf8');
-  const field = (label) => text.match(new RegExp(`\\*\\*${label}:\\*\\*\\s*(.+)`, 'i'))?.[1]?.trim();
+  const text = readSmall(profileFile);
+  const field = (label) => text.match(new RegExp(`\\*\\*${label}:\\*\\*[ \\t]*([^\\n]+)`, 'i'))?.[1]?.trim();
   const mode = field('Mode');
   const identity = field('Git identity');
-  const id = identity?.match(/^(.+?)\s*<([^<>\s@]+@[^<>\s@]+)>$/);
+  const id = identity?.match(/^([^<]+)<([^<>\s@]+@[^<>\s@]+)>$/);
   profile = { mode: mode?.toLowerCase().match(/^(discreet|open)\b/)?.[1], name: id?.[1].trim(), email: id?.[2] };
   info(`project profile: ${profileFile}`);
   if (!profile.mode) warn(`${profileFile}: "Mode" must be discreet or open, found "${mode ?? ''}" — fix the profile (project-kickoff)`);

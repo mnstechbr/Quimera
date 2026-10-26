@@ -6,7 +6,7 @@
 
 **Expected:** Kickoff offers the private memory history; `memory.mjs init` runs; `close-task` saves the memory after each task.
 
-**Evidence:** `.quimera/memory.git` with one commit per task; `doctor` shows no memory note.
+**Evidence:** `.git/quimera-memory.git` with one commit per task; `doctor` shows no memory note.
 
 **Rules:** `skills/project-kickoff/references/questions.md` · `scripts/memory.mjs` · `skills/close-task/SKILL.md`
 

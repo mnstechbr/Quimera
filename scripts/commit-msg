@@ -9,8 +9,10 @@ fail() {
   echo "quimera commit-msg guard: $1; the message was left unchanged" >&2
   exit 1
 }
-tmp=$(mktemp "${TMPDIR:-/tmp}/quimera-msg.XXXXXX") || fail "cannot create a temporary file"
-trap 'rm -f "$tmp" "$tmp.out"' EXIT
+# A private folder of its own, so no other user can plant a file name the guard writes to.
+dir=$(mktemp -d "${TMPDIR:-/tmp}/quimera-msg.XXXXXX") || fail "cannot create a temporary folder"
+trap 'rm -rf "$dir"' EXIT
+tmp="$dir/filtered"
 grep -v -i -E \
   -e '^co-authored-by:.*(claude|anthropic|openai|codex|copilot|chatgpt|gpt|gemini|cursor|deepseek|mimo)' \
   -e '^(🤖 )?generated (with|by) .*(claude|codex|copilot|chatgpt|gpt|gemini|cursor|(^|[^a-z])ai([^a-z]|$))' \
@@ -20,6 +22,6 @@ grep -v -i -E \
 [ $? -le 1 ] || fail "could not filter the message"
 # Drop trailing blank lines left behind, keeping each line's own ending (LF or CRLF).
 awk '{ line = $0; sub(/\r$/, "", line) } line ~ /[^ \t]/ { for (i = 0; i < blank; i++) print held[i]; blank = 0; print; next } { held[blank++] = $0 }' \
-  "$tmp" > "$tmp.out" || fail "could not tidy the message"
-cat "$tmp.out" > "$msg_file" || fail "could not write the message"
+  "$tmp" > "$dir/tidy" || fail "could not tidy the message"
+cat "$dir/tidy" > "$msg_file" || fail "could not write the message"
 exit 0
