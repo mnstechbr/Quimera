@@ -321,7 +321,7 @@ function doctor() {
   console.log(`Quimera ${m.version}${m.source ? ` (${m.source})` : ''} · tools: ${m.tools.join(', ')} · models: ${m.models ?? 'full'} · kit available: ${VERSION}`);
   console.log(missing.length ? `missing files:\n${missing.map((f) => `  ${f}`).join('\n')}` : 'all kit files present');
   console.log(existsSync('AGENTS.md') ? 'AGENTS.md present' : 'no AGENTS.md yet: run the project-kickoff skill');
-  const r = spawnSync(process.execPath, [join(KIT, 'scripts', 'git-preflight.mjs'), '--no-fetch'], { stdio: 'inherit' });
+  const r = spawnSync(process.execPath, [join(KIT, 'scripts', 'git-preflight.mjs')], { stdio: 'inherit' });
   if (r.error || r.signal) console.error(`The git preflight did not finish: ${r.error?.message ?? `stopped by ${r.signal}`}`);
   process.exit(missing.length || r.status !== 0 ? 1 : 0);
 }

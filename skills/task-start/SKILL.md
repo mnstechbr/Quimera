@@ -39,7 +39,7 @@ If the request is too vague to choose a depth, ask one question with your recomm
 
 ## 3. Git preflight
 
-Run `node .quimera/scripts/git-preflight.mjs` in the foreground and read the whole output. Exit 0 means clean; exit 1 means something needs attention and the output says what.
+Run `node .quimera/scripts/git-preflight.mjs --fetch` in the foreground and read the whole output. `--fetch` refreshes the remote first; without it the script stays offline. Exit 0 means clean; exit 1 means something needs attention and the output says what.
 
 If the script is missing or cannot run, use the equivalent commands and tell the user which ones you ran:
 
@@ -84,6 +84,9 @@ Interpret the result before doing anything else.
 | Git identity differs from `AGENTS.md` | Stop; fix with repo-local config before any commit |
 | Another session or worktree active here | Propose a separate worktree; ask first |
 | Detached HEAD | Describe it and ask; do not commit on it |
+| No commits yet, or no default branch | Create the default branch with a first commit, with the user's ok, before any task branch |
+| This branch is built on another unmerged task branch | Tell the user; integrate that branch first unless they want stacking |
+| `docs/STATE.md` is stale | Rewrite it whole from the repository before starting (close-task, step 3) |
 | Preflight script missing | Run the equivalent commands; list them |
 
 ## 4. Create the branch
