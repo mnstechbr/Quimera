@@ -26,19 +26,49 @@ Before saying anything is done, fixed or passing:
 | Tests pass | The related tests run: N passed, 0 failed | A previous run; "should pass" |
 | Bug fixed | The regression test that failed before now passes, and the original reproduction no longer shows the bug | The code changed; a different test passes |
 | Regression test works | It fails without the fix and passes with it | It passes once |
-| UI fixed | Seen in a browser or screenshot at the relevant widths (e.g. 360, 768, 1280 px) and states (empty, loading, error) | The CSS looks right; the build passed |
+| UI fixed | Full-resolution screenshots at the project's widths, including the widest (e.g. 375, 768, 1280, 1920 px), of the changed section and its neighbours, in each state (empty, loading, error) | The CSS looks right; the build passed; one downscaled screenshot |
+| Works on the device | Run on a real target device when the product targets one (phone, tablet, console), and the result seen there | It works in the desktop browser or emulator only |
+| Game or interactive flow works | The failure paths checked as well as the success path: unreachable goals, soft-locks, what the camera hides; a headless or scripted run when the engine allows it | It was played once and reached the end |
+| Matches the approved reference | Side by side with the reference the owner approved (concept art, design direction, prototype), differences listed | It "looks like" the reference |
 | Migration safe | Applied, and rolled back if the project supports it, on a disposable database; data checked after | The SQL reads correctly |
 | Build works | Build of the affected packages: exit 0 | Type check passed |
 | Requirements met | Each requirement in the plan or spec checked off against the code | Tests pass |
 | A subagent finished its task | You read the diff and ran its verification yourself, or confirmed its reported command and output | The subagent said "done" |
-| Ready to push | `node .quimera/scripts/verify.mjs push`: exit 0 | The per-task checks passed |
+| Ready to push | `node .quimera/scripts/verify.mjs push`: `Result: passed` (exit 0) | The per-task checks passed; `Result: unverified` |
 
 Documentation-only changes need no code checks; re-read the rendered result instead.
+
+When the owner tries a delivery and rejects it, that is a failed check, the same as a red test: report it as failed, and count it in the failure budget (`QUIMERA.md`, "Verification").
 
 ## The two commands
 
 - **During work:** `node .quimera/scripts/verify.mjs` — lint on changed files, type check, tests related to the changed files. Run it after each task or meaningful change. `--plan` shows what it would run without running it.
 - **Before the push, once:** `node .quimera/scripts/verify.mjs push` — the project's full verify script and the build of affected packages. Not after every edit.
+
+Each step ends in one of four states, and the last line counts them (`Result: unverified · 1 passed · 2 unverified`). Read every step, not only the last line:
+
+| State | Meaning | Exit |
+|---|---|---|
+| passed | The command ran and succeeded | 0 |
+| failed | The command ran and failed | 1 |
+| unverified | The check is needed but could not run (no script, no tool, no tests found) | 3 |
+| not applicable | The check does not apply to this change, with the reason | 0 |
+
+`unverified` is not a pass. Either make the check runnable or tell the user it was not verified and why.
+
+**Declared checks.** For a project without `package.json`, or whenever detection picks the wrong commands, list the project's own checks in `.quimera/checks.json` (start from `.quimera/templates/checks.json`). When the file exists, it replaces detection:
+
+```json
+{
+  "checks": [
+    { "name": "verify", "run": ["bash", "tools/verify.sh"] },
+    { "name": "export", "run": ["bash", "tools/export.sh"], "when": "push" },
+    { "name": "test", "skip": "no automated tests yet; the manual checks are listed in docs/STATE.md" }
+  ]
+}
+```
+
+`run` is the command as a list (no shell); `when` is `changed` (the default, also run before the push) or `push`; `cwd` is a folder inside the project; `skip` marks a check that does not apply, and must say why. The file belongs to the project: the installer never changes it.
 
 When a narrower command proves the claim faster (one test file, one type check), use it, and say so. When the script is missing, use the commands from `AGENTS.md` and name them.
 

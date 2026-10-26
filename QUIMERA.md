@@ -123,7 +123,7 @@ The project profile's "Models" line names the providers (or the exact models) th
 
 ## Verification
 
-- Run the smallest command that proves the claim: lint and type checks on what changed, and the tests connected to it. `node .quimera/scripts/verify.mjs` does this.
+- Run the smallest command that proves the claim: lint and type checks on what changed, and the tests connected to it. `node .quimera/scripts/verify.mjs` does this. Each check ends passed, failed, unverified or not applicable; unverified is never a pass. A project without `package.json` declares its checks in `.quimera/checks.json`.
 - Run the full suite and the build once before the push, not after every edit.
 - Documentation-only changes need no code checks.
 - Always run checks in the foreground, wait for them, and read the result.

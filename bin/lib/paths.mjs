@@ -11,7 +11,7 @@ import { join } from 'node:path';
 export const MANAGED_DIRS = ['.quimera/', '.agents/skills/', '.claude/skills/', '.claude/agents/', '.github/skills/', '.cursor/skills/'];
 export const MANAGED_FILES = ['CLAUDE.md', '.github/copilot-instructions.md'];
 // Files inside managed folders that belong to the project, never to the manifest.
-const PROJECT_FILES = ['.quimera/PROFILE.md', '.quimera/manifest.json'];
+const PROJECT_FILES = ['.quimera/PROFILE.md', '.quimera/manifest.json', '.quimera/checks.json'];
 
 // Why `p` can never be a managed path, or null when it can.
 export function pathProblem(p) {

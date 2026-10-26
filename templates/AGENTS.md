@@ -21,7 +21,7 @@ This project follows Quimera. Read `.quimera/QUIMERA.md` at the start of every t
 - {{Stack, e.g. Next.js · TypeScript · PostgreSQL}}
 - Package manager: {{npm | pnpm}} · Node {{24}}
 - Run: `{{pm}} run dev`
-- Verify what changed: `node .quimera/scripts/verify.mjs` · before the push: `node .quimera/scripts/verify.mjs push`
+- Verify what changed: `node .quimera/scripts/verify.mjs` · before the push: `node .quimera/scripts/verify.mjs push` · the project's own checks, when declared: `.quimera/checks.json`
 
 ## Non-negotiable rules
 
