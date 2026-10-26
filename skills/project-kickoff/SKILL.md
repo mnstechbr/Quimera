@@ -35,9 +35,9 @@ Ask one at a time. Each question gets: the question, one plain line on why it ma
 **(c) Quimera files: committed or local-only?**
 - *Committed:* the kit and memory files live in the repository and travel with it to every computer and collaborator.
 - *Local-only:* they stay on this machine through `.git/info/exclude` and are never pushed.
-- Why it matters: local-only keeps the employer's repository free of your process files, but the memory then does not follow you to another computer.
-- Recommend *local-only* for employer or corporate repositories; *committed* for the user's own projects.
-- In discreet mode, committed Quimera files (`AGENTS.md`, `.quimera/`, skills folders, role agents) show in the history that agents are used. Recommend local-only for discreet projects unless the user does not mind.
+- Why it matters: local-only keeps the employer's repository free of your process files, but then the memory is not in the project's history: without its own history (below) it exists only on this disk.
+- Recommend *local-only* only for employer or client repositories. Recommend *committed* for the user's own projects, discreet or not: the commit guard already keeps AI marks out of the history, and committed memory travels to every computer.
+- If the user picks local-only, ask two follow-ups in the same way: keep the product documents (`docs/vision/`, `docs/studies/`, `docs/plans/`, `docs/reviews/`) out of git too? (recommend no, unless the repository belongs to someone else); and keep a private history of the memory on this machine? (recommend yes: without it a lost disk loses every decision).
 
 **(d) Who is the product for, and in which languages will the finished product be?**
 - Ask for the audience in the user's words (who uses it, in what situation). Then the product languages (for example Portuguese only; Portuguese and English).
@@ -63,7 +63,7 @@ Summarize all answers in one short message and ask for confirmation. Then:
 2. **Pushing.** Record "ask every time" in the profile unless the user has already given a standing permission (then record its date and scope).
 3. **Specialist reviewers.** Record "security, database, interface" in the profile (wherever the profile lives: `AGENTS.md` or `.quimera/PROFILE.md`), dropping `interface` when the project has no user interface and `database` when it has no database. Mention it in the summary; the user can turn any of them off later.
 4. **Discreet mode.** Run `node .quimera/scripts/install-hooks.mjs`. It installs the `commit-msg` guard into this repository's hooks folder (local only, never committed). If it reports a different `commit-msg` hook already there, tell the user and do not overwrite it.
-5. **Local-only.** Run `node .quimera/scripts/local-only.mjs`. It appends the Quimera and memory paths to `.git/info/exclude` and lists any of them git already tracks. Then run `git status --short` and confirm none of them appear. Exclude does not hide files git already tracks: if any are listed, say so and ask (see "Existing project").
+5. **Local-only.** Run `node .quimera/scripts/local-only.mjs`, adding `--product-docs` if the user chose to hide the product documents too. It writes exact paths for the kit and memory files into `.git/info/exclude` (the project's own files in the same folders stay visible) and lists any of them git already tracks. Then run `git status --short` and confirm none of them appear. Exclude does not hide files git already tracks: if any are listed, say so and ask (see "Existing project"). If the user wants the private memory history, run `node .quimera/scripts/memory.mjs init` after the memory files exist (step 6): it keeps them in `.quimera/memory.git`, with no remote.
 6. **Memory files.** Create from `.quimera/templates/`:
    - `AGENTS.md`: fill the project profile with the answers; fill name, one-sentence description, stack and commands with what you know; leave `{{…}}` placeholders you cannot fill as `TBD` and list them in STATE.md "Open questions".
    - `.quimera/checks.json`: when the project has no `package.json` (or its scripts are not the real checks), write the project's own check commands there from `.quimera/templates/checks.json`, so `verify.mjs` runs them (format in `verification`). Mark a check that does not exist yet with `skip` and the reason.
@@ -90,14 +90,7 @@ Never put a secret, password or token in any memory file.
 
 ## Existing project
 
-Kickoff on a project that already has history adds to it; it does not reorganize it.
-
-- **Never modify code, configuration or tests** during kickoff.
-- **Existing `AGENTS.md`:** add the project profile and the "Process" section at the top; do not rewrite or reorder the rest. If it is tracked and the mode is local-only, do not edit it (the edit would appear in the user's diff). Write the profile to `.quimera/PROFILE.md` instead (from `.quimera/templates/PROFILE.md`; `.quimera/` is excluded in local-only mode). The preflight and every skill read it there.
-- **Existing state, handoff or decision files** (any name): do not rewrite or replace them, and do not create a duplicate that will drift. Point to them from `AGENTS.md` ("Where we stopped: `memory/CURRENT.md`") and from `docs/MAP.md`. Create a Quimera file only where nothing equivalent exists, and ask first when it is unclear.
-- **Existing decisions log:** continue its numbering and format instead of starting `docs/DECISIONS.md`; record the kickoff there.
-- **No renames or moves** of files or folders without asking, even when the Quimera layout differs.
-- **Existing rules win.** If the project's own instructions conflict with QUIMERA.md, they win (QUIMERA.md says so). List the conflicts you noticed for the user in one short message instead of resolving them yourself.
+Kickoff on a project that already has history adds to it; it does not reorganize it. Never modify code, configuration or tests during kickoff, never rename or move files, and let the project's own rules win over QUIMERA.md. Follow `references/existing-project.md` for an existing `AGENTS.md`, existing state or decision files, and conflicts.
 
 ## Finish
 

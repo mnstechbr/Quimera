@@ -40,7 +40,7 @@ Do this before committing, so memory and work land in the same commit. Record ea
 - **`docs/standards/INDEX.md`:** re-index if a standard was added or changed.
 - **Anything else** worth knowing next time (a trap you hit, a non-obvious setup step): decide where it belongs among the files above. Do not create new memory files without a reason.
 
-If `AGENTS.md` says the Quimera files are `local-only`, update them the same way; they stay out of the commit by design.
+If `AGENTS.md` says the Quimera files are `local-only`, update them the same way; they stay out of the commit by design. Then save them in the private memory history, if the project has one: `node .quimera/scripts/memory.mjs save -m "docs: <what changed>"`.
 
 ## 4. Check identity and branch
 

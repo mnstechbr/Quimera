@@ -22,7 +22,7 @@ export function pathProblem(p) {
   // Windows drops a trailing dot or space, so ".. " would climb like "..".
   if (parts.some((s) => s === '' || s === '.' || s === '..' || /[. ]$/.test(s))) return 'has an empty, "." or ".." segment';
   if (parts.some((s) => s.toLowerCase() === '.git')) return 'points into git metadata';
-  if (PROJECT_FILES.includes(p)) return 'belongs to the project, not to the kit';
+  if (PROJECT_FILES.includes(p) || p.startsWith('.quimera/memory.git/')) return 'belongs to the project, not to the kit';
   if (!MANAGED_FILES.includes(p) && !MANAGED_DIRS.some((d) => p.startsWith(d))) return 'is outside the folders Quimera manages';
   return null;
 }

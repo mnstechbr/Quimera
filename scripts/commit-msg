@@ -1,16 +1,25 @@
 #!/bin/sh
 # quimera:commit-msg — discreet mode guard.
 # Removes AI co-author trailers and "generated with" lines from commit messages,
-# whatever tool wrote them. Installed into .git/hooks/ (local only, never committed).
+# whatever tool wrote them. Installed into the git hooks folder (local only, never committed).
+# If anything goes wrong, the message is left as it was and the commit stops with an error.
 msg_file="$1"
 [ -f "$msg_file" ] || exit 0
-tmp="$msg_file.quimera.tmp"
+fail() {
+  echo "quimera commit-msg guard: $1; the message was left unchanged" >&2
+  exit 1
+}
+tmp=$(mktemp "${TMPDIR:-/tmp}/quimera-msg.XXXXXX") || fail "cannot create a temporary file"
+trap 'rm -f "$tmp" "$tmp.out"' EXIT
 grep -v -i -E \
   -e '^co-authored-by:.*(claude|anthropic|openai|codex|copilot|chatgpt|gpt|gemini|cursor|deepseek|mimo)' \
   -e '^(🤖 )?generated (with|by) .*(claude|codex|copilot|chatgpt|gpt|gemini|cursor|(^|[^a-z])ai([^a-z]|$))' \
   -e '^claude-session:' \
-  "$msg_file" > "$tmp" || true
-# Drop trailing blank lines left behind.
-awk 'NF {for (i = 0; i < blank; i++) print ""; blank = 0; print; next} {blank++}' "$tmp" > "$msg_file"
-rm -f "$tmp"
+  "$msg_file" > "$tmp"
+# grep exits 1 when it removed every line; 2 or more is an error.
+[ $? -le 1 ] || fail "could not filter the message"
+# Drop trailing blank lines left behind, keeping each line's own ending (LF or CRLF).
+awk '{ line = $0; sub(/\r$/, "", line) } line ~ /[^ \t]/ { for (i = 0; i < blank; i++) print held[i]; blank = 0; print; next } { held[blank++] = $0 }' \
+  "$tmp" > "$tmp.out" || fail "could not tidy the message"
+cat "$tmp.out" > "$msg_file" || fail "could not write the message"
 exit 0

@@ -1,0 +1,16 @@
+#!/bin/sh
+# quimera:commit-msg — discreet mode guard.
+# Removes AI co-author trailers and "generated with" lines from commit messages,
+# whatever tool wrote them. Installed into .git/hooks/ (local only, never committed).
+msg_file="$1"
+[ -f "$msg_file" ] || exit 0
+tmp="$msg_file.quimera.tmp"
+grep -v -i -E \
+  -e '^co-authored-by:.*(claude|anthropic|openai|codex|copilot|chatgpt|gpt|gemini|cursor|deepseek|mimo)' \
+  -e '^(🤖 )?generated (with|by) .*(claude|codex|copilot|chatgpt|gpt|gemini|cursor|(^|[^a-z])ai([^a-z]|$))' \
+  -e '^claude-session:' \
+  "$msg_file" > "$tmp" || true
+# Drop trailing blank lines left behind.
+awk 'NF {for (i = 0; i < blank; i++) print ""; blank = 0; print; next} {blank++}' "$tmp" > "$msg_file"
+rm -f "$tmp"
+exit 0

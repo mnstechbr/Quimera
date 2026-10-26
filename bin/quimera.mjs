@@ -31,6 +31,7 @@ import { dirname, isAbsolute, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { MODES, PROFILES, SPECIALISTS, TOOLS, readManifest, writeManifest } from './lib/manifest.mjs';
 import { diskProblem, present } from './lib/paths.mjs';
+import { digest as digestOf, guardState, lf } from '../scripts/lib/guard.mjs';
 
 const KIT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const VERSION = JSON.parse(readFileSync(join(KIT, 'package.json'), 'utf8')).version;
@@ -357,21 +358,6 @@ function install({ update }) {
     notDone.push(`keeping *.quimera-new out of commits (.git/info/exclude): ${e.message.split('\n')[0]}`);
   }
 
-  // Helpers run from this kit, never from the project: a copy there may be old, edited or not ours.
-  const helper = (step, name) => {
-    const r = spawnSync(process.execPath, [join(KIT, 'scripts', name)], { stdio: 'inherit' });
-    const why = r.error ? `could not start (${r.error.message})` : r.signal ? `stopped by ${r.signal}` : r.status !== 0 ? `exited with ${r.status}` : null;
-    if (why) notDone.push(`${step}: ${why}. After fixing it, run: node .quimera/scripts/${name}`);
-    return !why;
-  };
-  let hook = old?.hook ?? null;
-  if (!update && options.mode === 'discreet' && helper('the discreet-mode commit-msg guard', 'install-hooks.mjs')) {
-    const path = join(gitPath('hooks'), 'commit-msg');
-    const rel = relative(root, path);
-    hook = { path: rel.startsWith('..') || isAbsolute(rel) ? path : rel.split(sep).join('/'), digest: sha(path) };
-  }
-  if (!update && options['local-only']) helper('the local-only exclusions', 'local-only.mjs');
-
   const source = (() => {
     try {
       return execFileSync('git', ['-C', KIT, 'rev-parse', '--short', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
@@ -383,11 +369,51 @@ function install({ update }) {
     offers: [...new Set([...pairs.map(([, d]) => d), ...Object.keys(next)])].map((p) => `${p}.quimera-new`).filter(present).sort(),
     orphans: [...result.orphaned].sort(),
   };
-  // Written whole and then renamed, so a reader never sees half a manifest.
-  mkdirSync('.quimera', { recursive: true });
-  writeFileSync(`${MANIFEST}.tmp`, writeManifest({ desired, installed: { version: VERSION, source, files: next }, pending, hook }));
-  renameSync(`${MANIFEST}.tmp`, MANIFEST);
+  // Written whole and then renamed, so a reader never sees half a manifest. The helpers below read
+  // it (local-only excludes exactly the files it lists), so it is written before them.
+  let hook = old?.hook ?? null;
+  const saveManifest = () => {
+    mkdirSync('.quimera', { recursive: true });
+    writeFileSync(`${MANIFEST}.tmp`, writeManifest({ desired, installed: { version: VERSION, source, files: next }, pending, hook }));
+    renameSync(`${MANIFEST}.tmp`, MANIFEST);
+  };
+  saveManifest();
   rmSync(journal, { force: true });
+
+  // Helpers run from this kit, never from the project: a copy there may be old, edited or not ours.
+  const helper = (step, name, args = []) => {
+    const r = spawnSync(process.execPath, [join(KIT, 'scripts', name), ...args], { stdio: 'inherit' });
+    const why = r.error ? `could not start (${r.error.message})` : r.signal ? `stopped by ${r.signal}` : r.status !== 0 ? `exited with ${r.status}` : null;
+    if (why) notDone.push(`${step}: ${why}. After fixing it, run: node .quimera/scripts/${name}`);
+    return !why;
+  };
+  const hookFile = join(gitPath('hooks'), 'commit-msg');
+  const recordHook = () => {
+    const rel = relative(root, hookFile);
+    hook = { path: rel.startsWith('..') || isAbsolute(rel) ? hookFile : rel.split(sep).join('/'), digest: sha(hookFile) };
+  };
+  if (!update && options.mode === 'discreet' && helper('the discreet-mode commit-msg guard', 'install-hooks.mjs')) recordHook();
+  // An update refreshes the guard only when it is exactly one Quimera installed; an edited guard,
+  // another tool's hook or a shared hooks folder is left alone.
+  const notes = [];
+  if (update && existsSync(hookFile)) {
+    const nextGuard = lf(readFileSync(join(KIT, 'scripts', 'commit-msg'), 'utf8'));
+    const state = guardState(readFileSync(hookFile, 'utf8'), nextGuard, old?.hook?.digest ?? null);
+    const common = execFileSync('git', ['rev-parse', '--git-common-dir'], { encoding: 'utf8' }).trim();
+    const inGitDir = !relative(isAbsolute(common) ? common : join(root, common), hookFile).startsWith('..');
+    if (state === 'upgrade' && inGitDir) {
+      writeFileSync(hookFile, nextGuard);
+      chmodSync(hookFile, 0o755);
+      recordHook();
+      notes.push('the commit-msg guard was refreshed to this version');
+    } else if (state === 'upgrade') notes.push('the commit-msg guard is in a shared hooks folder: refresh it with node .quimera/scripts/install-hooks.mjs --shared');
+    else if (state === 'edited') notes.push('the commit-msg guard was edited here, so it was left as it is (compare it with .quimera/scripts/commit-msg)');
+    else if (state === 'current' && old?.hook?.digest !== digestOf(nextGuard)) recordHook();
+  }
+  // Local-only exclusions are exact, so they follow every change of the installed files.
+  const localOnly = options['local-only'] || (readProfile().localOnly ?? desired.localOnly);
+  if (localOnly) helper('the local-only exclusions', 'local-only.mjs');
+  if (hook !== old?.hook) saveManifest();
 
   console.log(`Quimera ${VERSION} ${update ? 'updated' : 'installed'} · ${setup}`);
   console.log(`  written: ${n(result.written)} file(s)`);
@@ -395,6 +421,7 @@ function install({ update }) {
   if (n(result.removed)) console.log(`  removed ${n(result.removed)} file(s) the kit no longer ships`);
   if (n(result.orphaned)) console.log(`  no longer shipped but edited by you, left in place:\n${result.orphaned.map((f) => `    ${f}`).join('\n')}`);
   if (n(result.skipped)) console.log(`  left untouched (not created by Quimera):\n${result.skipped.map((f) => `    ${f}`).join('\n')}`);
+  for (const x of notes) console.log(`  note: ${x}`);
   if (result.skipped.includes('CLAUDE.md') && existsSync('CLAUDE.md')) {
     const text = readFileSync('CLAUDE.md', 'utf8');
     if (!/^@AGENTS\.md\s*$/m.test(text)) console.log('  note: your CLAUDE.md does not import AGENTS.md, so Claude Code will not read it. Add a line "@AGENTS.md".');
@@ -473,6 +500,12 @@ function doctor() {
   if (profile.localOnly ?? m.desired.localOnly) {
     const ignored = spawnSync('git', ['check-ignore', '-q', '.quimera/QUIMERA.md']).status === 0;
     if (!ignored) problem('local-only', null, 'Quimera files should be local-only, but .quimera/ is not excluded from git: run node .quimera/scripts/local-only.mjs');
+    // Local-only memory exists only on this disk unless it has its own history.
+    if (!existsSync('.quimera/memory.git')) {
+      note('memory', null, 'local-only memory has no history and no copy: node .quimera/scripts/memory.mjs init keeps one in a private repository on this machine');
+    } else if (/Not saved yet/.test(spawnSync(process.execPath, [join(KIT, 'scripts', 'memory.mjs'), 'status'], { encoding: 'utf8' }).stdout ?? '')) {
+      note('memory', null, 'memory changes are not saved yet: node .quimera/scripts/memory.mjs save');
+    }
   }
   if (present(gitPath('quimera-update.json'))) problem('interrupted', null, 'a previous run did not finish: run update again to complete it');
   if (m.installed.version !== VERSION) note('version', null, `installed ${m.installed.version}; this kit is ${VERSION}: update moves to it`);

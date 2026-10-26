@@ -27,7 +27,7 @@ When this file and the project's `AGENTS.md` disagree, `AGENTS.md` wins: it hold
 
 - **Mode.** `discreet`: work happens on the user's machine, commits carry only the user's identity, and no AI marks appear in branches, commits or pull requests. `open`: agents may work directly on the remote and AI marks are acceptable.
 - **Identity.** The git name and email for this project. Check them before the first commit of every session (`task-start`), because git identity is per machine and the user works on more than one computer.
-- **Quimera files.** `committed` (kit and memory files live in the repository) or `local-only` (kept on the user's machine through `.git/info/exclude`, never pushed).
+- **Quimera files.** `committed` (kit and memory files live in the repository) or `local-only` (kept on the user's machine through `.git/info/exclude`, never pushed, with an optional private history in `.quimera/memory.git`). Local-only is for repositories that belong to someone else; the user's own projects commit their memory.
 - **Specialist reviewers.** Which specialists `code-review` may add (security, database, interface), or `off`.
 - **Models.** The providers or exact models the user works with, and the model profile, `full` or `economic` (see "Model profile").
 
