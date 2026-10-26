@@ -97,7 +97,10 @@ Name it `<type>/<short-kebab-description>`, in English:
 - describe the change, not the tool: `fix/order-total-rounding`, `feat/csv-export`;
 - never put tool or vendor names in it (no Claude, Codex, Copilot, GitHub, GPT, agent).
 
-Create it from the up-to-date default branch: `git switch -c <name>`. Trivial changes get a branch too.
+Create it from the up-to-date default branch, naming the base so it never stacks on the previous task: `git switch -c <name> <default>`. Trivial changes get a branch too.
+
+- If the previous task's branch is finished but not integrated yet, integrate it first (`close-task`, step 6 or 7) or ask the user. Start a branch on top of another task branch only when the user asks for that.
+- If the repository has no commits or no default branch, create it first (`project-kickoff`, step 9) before any task branch.
 
 ## 5. Discreet mode check
 

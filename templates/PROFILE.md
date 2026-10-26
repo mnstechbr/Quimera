@@ -7,5 +7,6 @@
 - **Quimera files:** local-only
 - **User's language:** {{Brazilian Portuguese}}
 - **Pushing:** {{ask every time | allowed without asking — date and scope}}
+- **Integrating:** {{ask every time | after each verified task — date}} (finished task branches into the default branch, on this machine)
 - **Specialist reviewers:** {{security, database, interface | off}}
 - **Models:** {{providers or exact models, e.g. Anthropic}} · {{full | economic}} (tiers per `.quimera/adapters/models.md`)

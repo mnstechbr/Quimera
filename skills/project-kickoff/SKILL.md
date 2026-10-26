@@ -15,7 +15,7 @@ Read `.quimera/QUIMERA.md` first; this skill fills the "Project profile" it desc
 2. List which of these already exist: `AGENTS.md`, a tool-specific instruction file (for example `CLAUDE.md`), `docs/STATE.md`, `docs/MAP.md`, `docs/VISION.md`, `docs/DECISIONS.md`, and any other state or handoff file the project already uses (for example `memory/CURRENT.md`, `docs/CURRENT-HANDOFF.md`). If any exist, follow "Existing project" below as well.
 3. Note what the user already told you in this conversation. Never ask what they already answered.
 4. **If the user brought a vision file** (an idea, a brief, a spec: Markdown, Word, PDF or plain text), read all of it now, before the first question. Convert it to text with the tools already available (for a Word file, a document converter; for a PDF, a text extractor). Do not install anything to read it; if you cannot, ask the user for a Markdown or plain-text copy. Keep the original in `docs/vision/` and note which questions below it already answers. Ask only what it leaves open; for what it answers, show the answer you found and ask the user to confirm it in the same summary.
-5. If the folder is not a git repository, ask before running `git init`.
+5. If the folder is not a git repository, ask before running `git init -b main` (or the default branch name the user prefers).
 
 ## The questions
 
@@ -60,7 +60,7 @@ If the user starts describing the problem or the product at any point, let them 
 Summarize all answers in one short message and ask for confirmation. Then:
 
 1. **Git identity.** Run `git config --local user.name "<name>"` and `git config --local user.email "<email>"`. Local scope only; never touch the global config. Read the values back to confirm.
-2. **Pushing.** Record "ask every time" in the profile unless the user has already given a standing permission (then record its date and scope).
+2. **Pushing and integrating.** Record "ask every time" for pushing, and for integrating finished task branches into the default branch on this machine, unless the user has already given a standing permission (then record its date and scope).
 3. **Specialist reviewers.** Record "security, database, interface" in the profile (wherever the profile lives: `AGENTS.md` or `.quimera/PROFILE.md`), dropping `interface` when the project has no user interface and `database` when it has no database. Mention it in the summary; the user can turn any of them off later.
 4. **Discreet mode.** Run `node .quimera/scripts/install-hooks.mjs`. It installs the `commit-msg` guard into this repository's hooks folder (local only, never committed). If it reports a different `commit-msg` hook already there, tell the user and do not overwrite it.
 5. **Local-only.** Run `node .quimera/scripts/local-only.mjs`, adding `--product-docs` if the user chose to hide the product documents too. It writes exact paths for the kit and memory files into `.git/info/exclude` (the project's own files in the same folders stay visible) and lists any of them git already tracks. Then run `git status --short` and confirm none of them appear. Exclude does not hide files git already tracks: if any are listed, say so and ask (see "Existing project"). If the user wants the private memory history, run `node .quimera/scripts/memory.mjs init` after the memory files exist (step 6): it keeps them in `.quimera/memory.git`, with no remote.
@@ -74,6 +74,7 @@ Summarize all answers in one short message and ask for confirmation. Then:
 7. **Tool instruction file.** If a tool-specific file (for example `CLAUDE.md`) exists and does not import or point to `AGENTS.md` (for example a line `@AGENTS.md`), tell the user that tool will not read AGENTS.md, and offer to add the import at the top. Change it only after they agree. On a new project, offer to create the pointer files for the tools they use from `.quimera/templates/`.
 
 8. **Model profile in each tool.** For each tool the user named, read its adapter (`.quimera/adapters/<tool>.md`, "Tiers") and apply the profile the way it says, for example role agents that carry a model. The user already confirmed the profile in the summary; do not ask again, but say what you changed.
+9. **Default branch (repository without commits).** Without a first commit the default branch does not exist, and every task branch would stack on the one before. If `git branch --show-current` is not the default the user wants, set it with `git symbolic-ref HEAD refs/heads/<default>`. Then, with the user's ok, commit what belongs in the history (`.gitignore` if there is one, and the memory files in committed mode) with `chore: start project`; if nothing is to be committed (local-only), use `git commit --allow-empty -m "chore: start project"`. Every task branch starts from this branch (`task-start`).
 
 ### D-001
 
@@ -105,7 +106,7 @@ Report in the user's language, short:
   - `design-directions` — before the first screen, if there is a UI.
   - `code-standards` — when there is existing code to learn the user's conventions from.
 
-Kickoff makes no commit by itself. In committed mode, offer to commit them on a `chore/…` branch with the project identity (`close-task`).
+Kickoff commits only on a repository without commits (step 9). On a repository with history, offer to commit the memory files in committed mode on a `chore/…` branch with the project identity (`close-task`).
 
 ## Common mistakes
 

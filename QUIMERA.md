@@ -115,6 +115,7 @@ The project profile's "Models" line names the providers (or the exact models) th
 ## Git
 
 - Work on a new branch for every change: `feat/…`, `fix/…`, `chore/…`, `docs/…`, `refactor/…`, `test/…`, in English, short and descriptive.
+- Every task branch starts from the default branch and goes back to it: through a pull request where the project has a remote, or by a local fast-forward merge where it does not (`close-task`). A new repository gets its default branch from its first commit (`project-kickoff`); never stack task branches unless the user asks.
 - Commit messages follow Conventional Commits: `feat: add order export`. Several small local commits are fine.
 - Never put tool or vendor names (Claude, Codex, Copilot, GitHub, GPT) in branch names or commit messages. In discreet mode, never add co-author trailers or "generated with" lines.
 - Push only when the user agrees, grouping commits that belong to the same subject, with the project's identity. If the push cannot run from here, give the user the exact command and branch name.

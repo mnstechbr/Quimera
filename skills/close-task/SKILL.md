@@ -9,7 +9,7 @@ Finish a task so that any agent, on any computer, can pick it up from the reposi
 
 **Core principle:** never lose work and never leave a mess. Clean only what you created, never force-push, never delete anything that is not clearly yours without the user typing an explicit confirmation.
 
-Track the steps in a checklist. Steps 1 to 5 always run; step 6 when there is something to push; step 7 only after a merge.
+Track the steps in a checklist. Steps 1 to 5 always run; step 6 when the project integrates on this machine (no remote, or no pull requests); step 7 when there is something to push; step 8 only after a merge on the remote.
 
 ## 1. Verify
 
@@ -59,7 +59,17 @@ Run `node .quimera/scripts/git-preflight.mjs` (or compare `git config user.name`
 - **Discreet mode:** no co-author trailer and no "generated with" line. The commit-msg hook strips them, but check: `git log -1 --format=%B`. If one slipped through, fix the message with `git commit --amend`, which is allowed only because the commit has not been pushed. Never amend a pushed commit.
 - **Open mode:** attribution lines are acceptable if the project wants them.
 
-## 6. Push (only with the user's agreement)
+## 6. Integrate locally
+
+When the project has no remote, or the user integrates on this machine, a finished task goes back to the default branch here. Without this step the next task starts on top of this one, and the default branch never receives anything. Integrate when the profile's "Integrating" line allows it; otherwise ask the user.
+
+1. Only after step 1 passed for this task and step 5 committed everything: `git status --porcelain` prints nothing.
+2. `git switch <default>`
+3. `git merge --ff-only <branch>`. If it refuses because the default branch moved (another task was integrated first), tell the user and merge with `git merge --no-ff <branch>`. Never rebase, reset or force.
+4. Delete the integrated branch with the safe form: `git branch -d <branch>`.
+5. Run `node .quimera/scripts/git-preflight.mjs` and read it: no stacked branches, clean tree.
+
+## 7. Push (only with the user's agreement)
 
 1. Ask the user whether to push now, unless `AGENTS.md` grants standing permission (and the work is inside its scope). Recommend pushing when the commits form a complete subject; recommend waiting when more commits on the same area are coming, so they go up together.
 2. Make sure `node .quimera/scripts/verify.mjs push` passed on the exact tree being pushed.
@@ -78,7 +88,7 @@ Run `node .quimera/scripts/git-preflight.mjs` (or compare `git config user.name`
      ```
 5. **Push rejected:** the remote moved. Fetch, look at what changed, and tell the user. Never force-push, never rewrite published history, unless the user explicitly asks for that exact operation.
 
-## 7. After the merge
+## 8. After the merge
 
 Only when the user says the branch or pull request was merged:
 
@@ -95,14 +105,14 @@ Only when the user says the branch or pull request was merged:
 - If removal is refused because of modified or untracked files, those files exist nowhere else. Show them (`git -C <path> status --porcelain -uall`) and ask: commit them, move them, or delete them. Deleting needs the user's typed confirmation. Never add `--force` on your own.
 - Leave worktrees managed by the tool or by another session alone.
 
-## 8. Report to the user
+## 9. Report to the user
 
 In the user's language, short and plain:
 
 - **What changed:** one to five lines, in terms of behavior, not files.
 - **How it was verified:** command → result.
 - **Pending:** what is left, open questions, Minor review findings recorded.
-- **Git:** branch, commits (subject lines), pushed or not; if not, the exact push command.
+- **Git:** branch, commits (subject lines), integrated into the default branch or not, pushed or not; if not pushed, the exact push command.
 - **Next step:** one concrete action.
 
 If the work was large and the tool can produce one, offer an interactive HTML report.
@@ -114,6 +124,7 @@ If the work was large and the tool can produce one, offer an interactive HTML re
 - Deleting "stale-looking" branches, worktrees or containers that someone else owns.
 - Pushing because the work "looks done" without asking.
 - Answering a rejected push with a force-push.
+- Leaving a finished branch unintegrated in a project without a remote, so the next task stacks on it.
 
 ## Provenance
 
