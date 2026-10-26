@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: "Use before pushing anything beyond a small change, after a risky change (auth, permissions, data isolation, schema, money, secrets, integrations), when stuck and a fresh view would help, and whenever you receive review feedback from a reviewer, the user or a pull request."
+description: "Use at the end of each phase or milestone, before any delivery to the owner (a build, a demo, a shared link), and before pushing anything beyond a small change; also after a risky change (auth, permissions, data isolation, schema, money, secrets, integrations), when stuck and a fresh view would help, and whenever you receive review feedback from a reviewer, the user or a pull request."
 ---
 
 # Code review
@@ -16,8 +16,8 @@ Two parts: **Requesting** a review from a fresh reviewer, and **Receiving** the 
 | Depth (see QUIMERA.md) | Review |
 |---|---|
 | Trivial, Small | Not required. |
-| Normal | Before the push. Reviewer tier: standard; strongest in the economic model profile (specialists: see "Specialist reviewers"). |
-| Risky | Before the push, and after each risky part if the work is long. Reviewer tier: strongest, for the lead reviewer too (see "Specialist reviewers"). |
+| Normal | At the end of each phase or milestone, before a delivery to the owner, and before the push. Reviewer tier: standard; strongest in the economic model profile (specialists: see "Specialist reviewers"). |
+| Risky | At the end of each phase or milestone, before a delivery and before the push, and after each risky part if the work is long. Reviewer tier: strongest, for the lead reviewer too (see "Specialist reviewers"). |
 
 Also useful: after fixing a hard bug, before a large refactor (baseline), or when stuck.
 

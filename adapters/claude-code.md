@@ -42,6 +42,30 @@ The model and effort for each tier, in the full and the economic profile, are in
 
 `code-review` decides which reviewers run (its "Specialist reviewers" table). In the full profile: for a general review at Normal depth, pass `model: sonnet` to `quimera-reviewer`; for Risky depth keep its default; at Risky depth, when `quimera-interface-reviewer` is the lead, pass `model: opus`. In the economic profile, keep every agent's default; passing a stronger model needs the user's ok.
 
+## Reminder after compaction (opt-in)
+
+When Claude Code compacts a long conversation, the working loop in `AGENTS.md` can drop out of view; in both pilot projects nobody re-read the memory files afterwards. This optional hook prints one reminder into the context after every compaction. It only runs `echo`: it reads nothing, writes nothing and calls nothing. Besides the commit-msg guard it is the only hook Quimera offers, and it is never installed on its own: offer it at kickoff and add it only with the user's ok, merged into `.claude/settings.local.json` (personal, not committed; if you create that file by hand, add it to `.git/info/exclude`).
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Context was compacted. Before acting, re-read AGENTS.md, docs/STATE.md and docs/MAP.md, then continue the working loop in AGENTS.md.'"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Checked against code.claude.com/docs/en/hooks and /settings on 2026-10-26: a `SessionStart` hook with the matcher `compact` runs after automatic and manual compaction, and the plain text it prints is added to the context.
+
 ## Discreet mode
 
 - The commit-msg guard (`node .quimera/scripts/install-hooks.mjs`) is the reliable protection: it strips co-author and "generated with" lines from every commit, whatever tool wrote it.

@@ -1,6 +1,6 @@
 # State
 
-> The repository wins over this file. Rewrite it whole at the end of each task (`close-task`), in the same commit as the work. No secrets.
+> The repository wins over this file. Rewrite it whole at the end of each task (`close-task`), in the same commit as the work. Keep it under 60 lines and 6 KB: finished work belongs to the git history and docs/DECISIONS.md. No secrets.
 
 **Updated:** {{YYYY-MM-DD}}
 

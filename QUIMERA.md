@@ -55,7 +55,7 @@ When this file and the project's `AGENTS.md` disagree, `AGENTS.md` wins: it hold
 | Debug | `systematic-debugging` | Something fails and the cause is not obvious |
 | Verify | `verification` | Before any claim that something works |
 | Docs and code agree | `consistency-check` | When the work was planned from a vision, spec or plan |
-| Independent review | `code-review` | Before the push, for anything beyond a small change; specialists for security, database and performance, and interface and accessibility join when the diff touches their area |
+| Independent review | `code-review` | At the end of each phase or milestone, before any delivery to the owner, and before the push, for anything beyond a small change; specialists for security, database and performance, and interface and accessibility join when the diff touches their area |
 | Memory, commits, push | `close-task` | Always |
 
 **When a new skill seems needed:** `writing-skills`.
@@ -109,7 +109,8 @@ The project profile's "Models" line names the providers (or the exact models) th
 | `docs/standards/INDEX.md` | The user's coding standards, one line each | Load only the standards that match the files you touch |
 
 - Read `AGENTS.md`, then this file, then `docs/STATE.md` and `docs/MAP.md`. Open anything else only when the task needs it. Locate with search before reading; read large files in ranges.
-- `close-task` updates the memory files. You decide what else is worth documenting. Keep every file short and record each fact in one place only.
+- `close-task` updates the memory files at the end of every task, in the same commit as the work. You decide what else is worth documenting. Keep every file short and record each fact in one place only: `docs/STATE.md` under 60 lines and 6 KB, rewritten whole; `AGENTS.md` and `docs/MAP.md` corrected in the same commit as a change that contradicts them.
+- After context compaction, or in a new session, re-read `AGENTS.md`, `docs/STATE.md` and `docs/MAP.md` before acting. What you learn about the owner goes into `AGENTS.md`, never only into a tool's private memory.
 - The repository wins over the memory: if they disagree, say so and follow the repository.
 
 ## Git
@@ -128,7 +129,13 @@ The project profile's "Models" line names the providers (or the exact models) th
 - Run the full suite and the build once before the push, not after every edit.
 - Documentation-only changes need no code checks.
 - Always run checks in the foreground, wait for them, and read the result.
-- Failure budget, the same everywhere: after two failed attempts at the same failure, stop patching and rethink with `systematic-debugging` (a fresh look, or one tier up; in the economic profile, ask the user first). After a third, stop and bring it to the user with what was tried.
+- Failure budget, the same everywhere: after two failed attempts at the same failure, stop patching and rethink with `systematic-debugging` (a fresh look, or one tier up; in the economic profile, ask the user first), or with `study-round` when the problem is the design or the approach. When the owner rejects a delivery, that counts as a failed attempt. After a third, stop and bring it to the user with what was tried.
+
+## Costly actions
+
+- Builds for a device, large downloads, long renders and paid API calls wait until the owner has approved what they will show or produce. Say what each costs (time, size, money) and ask once.
+- Before a download of more than about 100 MB, or a job that can exhaust memory, check the free disk and memory.
+- A server, watcher or emulator started for a check is stopped when that check ends, not left for `close-task`. Say that it stopped.
 
 ## After the approach is agreed: stop and ask only when
 

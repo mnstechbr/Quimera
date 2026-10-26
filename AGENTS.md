@@ -28,6 +28,6 @@ This repository is the Quimera kit, not a project that uses it. Agents working h
 3. Skill frontmatter has only `name` and `description`.
 4. Every skill ends with a Provenance section. Anything adapted from an upstream project keeps its credit, and `NOTICE.md` lists the source.
 5. Never use the names "BMad", "BMAD" or "BMad Method" for any part of Quimera (trademark). Credit only.
-6. Nothing in the kit may install dependencies, start servers, call the network on its own, or run code automatically, apart from the opt-in commit-msg guard.
+6. Nothing in the kit may install dependencies, start servers, call the network on its own, or run code automatically, apart from the opt-in commit-msg guard and the opt-in compaction reminder for Claude Code, which only prints text.
 7. Bump `version` in `package.json` when skills or scripts change in a way that projects should pick up with `quimera update`.
 8. Test the installer in a scratch repository before committing changes to it: `init`, edit a file, `update`, `doctor`.

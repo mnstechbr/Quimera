@@ -13,9 +13,16 @@
 - **Specialist reviewers:** {{security, database, interface | off}}
 - **Models:** {{providers or exact models, e.g. Anthropic}} · {{full | economic}} (tiers per `.quimera/adapters/models.md`)
 
-## Process
+## Working loop
 
-This project follows Quimera. Read `.quimera/QUIMERA.md` at the start of every task, then `docs/STATE.md` and `docs/MAP.md`. Skills live in `.agents/skills/<name>/SKILL.md`; read a skill when its step comes up in the flow.
+This project follows Quimera (`.quimera/QUIMERA.md`; skills in `.agents/skills/<name>/SKILL.md`). For every request that changes files, however long the session:
+
+1. Say the depth and the branch before editing (`task-start`); a task branch starts from the default branch.
+2. Make the change.
+3. Verify with evidence and read the whole result (`verification`); an owner rejection is a failed check.
+4. Commit with `docs/STATE.md` rewritten in the same commit (`close-task`), then integrate or push as the profile says.
+5. After context compaction, or in a new session, re-read this file, `docs/STATE.md` and `docs/MAP.md` before acting.
+6. At the end of each phase or milestone, run `code-review` and the whole of `close-task`.
 
 ## Stack and commands
 

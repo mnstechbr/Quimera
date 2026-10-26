@@ -7,8 +7,8 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
 
 export const STATE_FILE = 'docs/STATE.md';
-const MAX_LINES = 60;
-const MAX_BYTES = 6 * 1024;
+export const MAX_LINES = 60;
+export const MAX_BYTES = 6 * 1024;
 // close-task rewrites STATE.md in the same commit as the work, so a few commits without it
 // means the loop was skipped.
 const MAX_COMMITS_SINCE = 3;

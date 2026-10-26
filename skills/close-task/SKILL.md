@@ -1,6 +1,6 @@
 ---
 name: close-task
-description: "Use at the end of every task, when the change is done and needs to be verified, cleaned up, recorded in project memory, committed, and possibly pushed; also when the user says a branch or pull request was merged."
+description: "Use at the end of every task (each request that changed files, not only at the end of a session), when the change is done and needs to be verified, cleaned up, recorded in project memory, committed, and integrated or pushed; also when the user says a branch or pull request was merged."
 ---
 
 # Close task
@@ -34,8 +34,9 @@ Anything you are not sure you created (an untracked file, a container, a branch,
 
 Do this before committing, so memory and work land in the same commit. Record each fact in one place only, and keep every file short.
 
-- **`docs/STATE.md`:** rewrite it whole. Now, last done (with how it was verified), next step, open questions with your recommended answer, branch and unpushed commits. No secrets.
+- **`docs/STATE.md`:** rewrite it whole, never patch single lines (patched files drift into contradictions). Now, last done (with how it was verified), next step, open questions with your recommended answer, branch and unpushed commits. Under 60 lines and 6 KB: finished work belongs to the git history and `DECISIONS.md`. Update the "Updated" date. No secrets.
 - **`docs/MAP.md`:** update if the structure, commands, entry points or patterns changed.
+- **`AGENTS.md`:** if the change contradicts it (stack, commands, rules, how the owner works), correct it in the same commit. A rule the owner changed gets a `DECISIONS.md` entry too.
 - **`docs/DECISIONS.md`:** add a `D-NNN · YYYY-MM-DD · title` entry for each decision made during the task (decision, why, alternatives rejected, decided by). Never edit an old entry; a changed decision gets a new entry that names the one it replaces.
 - **`docs/standards/INDEX.md`:** re-index if a standard was added or changed.
 - **Anything else** worth knowing next time (a trap you hit, a non-obvious setup step): decide where it belongs among the files above. Do not create new memory files without a reason.

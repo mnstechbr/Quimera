@@ -1,6 +1,6 @@
 ---
 name: task-start
-description: "Use at the start of every task, before reading code or editing anything. Loads the project memory, picks the depth (trivial, small, normal, risky), checks git state and identity, and creates the branch for the work."
+description: "Use before any change the owner asks for: at the start of a task, and again for each new request in a long session, before reading code or editing anything. Loads the project memory, picks the depth (trivial, small, normal, risky), checks git state and identity, and creates the branch for the work."
 ---
 
 # Task start
