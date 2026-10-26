@@ -8,6 +8,9 @@
   "bin": {
     "quimera": "bin/quimera.mjs"
   },
+  "scripts": {
+    "test": "node --test"
+  },
   "files": [
     "bin",
     "QUIMERA.md",
