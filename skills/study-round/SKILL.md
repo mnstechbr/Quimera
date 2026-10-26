@@ -1,6 +1,6 @@
 ---
 name: study-round
-description: Use before committing to an approach for a new product or a large feature: researches the problem, has 2–4 subagents write genuinely different proposals in parallel, has an independent judge score them, and ends in go, needs-clarification or kill. Skip for small features or when the user has already decided.
+description: "Use before committing to an approach for a new product or a large feature: researches the problem, has 2–4 subagents write genuinely different proposals in parallel, has an independent judge score them, and ends in go, needs-clarification or kill. Skip for small features or when the user has already decided."
 ---
 
 # Study round

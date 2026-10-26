@@ -1,6 +1,6 @@
 ---
 name: writing-plans
-description: Use for normal or risky work, after task-start (and architecture-review when risky), before touching code. Turns an agreed goal or spec into a task-by-task plan with exact files, interfaces, verification commands and parallel-safe markers.
+description: "Use for normal or risky work, after task-start (and architecture-review when risky), before touching code. Turns an agreed goal or spec into a task-by-task plan with exact files, interfaces, verification commands and parallel-safe markers."
 ---
 
 # Writing plans

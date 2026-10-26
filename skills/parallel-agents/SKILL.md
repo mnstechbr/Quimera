@@ -1,6 +1,6 @@
 ---
 name: parallel-agents
-description: Use to execute a plan from writing-plans, or any set of independent problems, by dispatching subagents: one fresh implementer per task, parallel only when tasks touch disjoint files, a reviewer per task, and a final review of the whole branch. Also covers inline execution when the tool has no subagents.
+description: "Use to execute a plan from writing-plans, or any set of independent problems, by dispatching subagents: one fresh implementer per task, parallel only when tasks touch disjoint files, a reviewer per task, and a final review of the whole branch. Also covers inline execution when the tool has no subagents."
 ---
 
 # Parallel agents

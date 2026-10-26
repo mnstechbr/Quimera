@@ -1,6 +1,6 @@
 ---
 name: systematic-debugging
-description: Use when a test fails, a build breaks, behavior is unexpected or a bug is reported and the cause is not already proven, and before proposing any fix. Also use after two failed attempts at the same failure.
+description: "Use when a test fails, a build breaks, behavior is unexpected or a bug is reported and the cause is not already proven, and before proposing any fix. Also use after two failed attempts at the same failure."
 ---
 
 # Systematic debugging

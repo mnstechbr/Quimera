@@ -9,7 +9,8 @@
     "quimera": "bin/quimera.mjs"
   },
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "check": "node dev/check-content.mjs"
   },
   "files": [
     "bin",

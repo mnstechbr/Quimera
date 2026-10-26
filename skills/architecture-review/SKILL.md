@@ -1,6 +1,6 @@
 ---
 name: architecture-review
-description: Use before the first code of a project, for every new feature, and for anything touching auth, permissions, data isolation or multi-tenancy, database schema or queries at scale, money, secrets or external integrations. Also use when the user asks "does this make sense?" about a design.
+description: "Use before the first code of a project, for every new feature, and for anything touching auth, permissions, data isolation or multi-tenancy, database schema or queries at scale, money, secrets or external integrations. Also use when the user asks 'does this make sense?' about a design."
 ---
 
 # Architecture review

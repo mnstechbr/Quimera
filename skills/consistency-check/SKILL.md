@@ -1,6 +1,6 @@
 ---
 name: consistency-check
-description: Use when work was planned from a vision, plan or design document and you need to know whether the documents agree with each other (before implementing) or whether the code does what they say (after implementing, before calling the work done).
+description: "Use when work was planned from a vision, plan or design document and you need to know whether the documents agree with each other (before implementing) or whether the code does what they say (after implementing, before calling the work done)."
 ---
 
 # Consistency check

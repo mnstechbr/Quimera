@@ -1,6 +1,6 @@
 ---
 name: verification
-description: Use before any claim that something works, passes, is fixed or is done — before committing, before moving to the next task, before reporting to the user, and before the push. Runs the smallest command that proves the claim and reads its output.
+description: "Use before any claim that something works, passes, is fixed or is done — before committing, before moving to the next task, before reporting to the user, and before the push. Runs the smallest command that proves the claim and reads its output."
 ---
 
 # Verification

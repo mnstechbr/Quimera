@@ -1,6 +1,6 @@
 ---
 name: close-task
-description: Use at the end of every task, when the change is done and needs to be verified, cleaned up, recorded in project memory, committed, and possibly pushed; also when the user says a branch or pull request was merged.
+description: "Use at the end of every task, when the change is done and needs to be verified, cleaned up, recorded in project memory, committed, and possibly pushed; also when the user says a branch or pull request was merged."
 ---
 
 # Close task
@@ -64,7 +64,7 @@ Run `node .quimera/scripts/git-preflight.mjs` (or compare `git config user.name`
 1. Ask the user whether to push now, unless `AGENTS.md` grants standing permission (and the work is inside its scope). Recommend pushing when the commits form a complete subject; recommend waiting when more commits on the same area are coming, so they go up together.
 2. Make sure `node .quimera/scripts/verify.mjs push` passed on the exact tree being pushed.
 3. Push with the project identity: `git push -u origin <branch>`.
-4. **The push cannot run from here, or the user prefers to push himself** (no credentials, a remote or cloud environment in a discreet project, the user asked for the commands): do not push. Give the user, ready to copy:
+4. **The push cannot run from here, or the user prefers to push it themselves** (no credentials, a remote or cloud environment in a discreet project, the user asked for the commands): do not push. Give the user, ready to copy:
    - the branch name;
    - the command: `git push -u origin <branch>`;
    - optionally a pull request title (English unless the project says otherwise, Conventional Commits style) and a plain description:

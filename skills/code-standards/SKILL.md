@@ -1,6 +1,6 @@
 ---
 name: code-standards
-description: Discover mode - when there is existing code to learn the user's conventions from, when the user points to his repositories, or when he corrects the same pattern twice. Apply mode - at the start of every task when docs/standards/INDEX.md exists, to load only the standards that match the files the task will touch.
+description: "Discover mode - when there is existing code to learn the user's conventions from, when the user points to their repositories, or corrects the same pattern twice. Apply mode - at the start of every task when docs/standards/INDEX.md exists, to load only the standards that match the files the task will touch."
 ---
 
 # Code standards
@@ -26,7 +26,7 @@ If the user named an area, use it. Otherwise scan the project structure and prop
 >
 > I recommend starting with the database, because a wrong pattern there is the most expensive to undo.
 
-Ask the user to pick one. If he points to several of his repositories, read them read-only: a pattern repeated across repositories is a strong standard. Ask before reading anything outside the current project.
+Ask the user to pick one. If the user points to several of their repositories, read them read-only: a pattern repeated across repositories is a strong standard. Ask before reading anything outside the current project.
 
 ### 2. Find candidates
 
@@ -52,7 +52,7 @@ Present the candidates with evidence and your recommendation:
 For each chosen standard, finish the whole loop before starting the next:
 
 1. Ask one or two questions about the why: what problem it solves, when it does not apply, what mistake people make with it.
-2. Draft the standard (format below) using his answer.
+2. Draft the standard (format below) using the user's answer.
 3. Show the draft and ask for approval or edits.
 4. Write the file. If a related standard file already exists, extend it instead of creating a near-duplicate.
 5. Add or update its row in `docs/standards/INDEX.md`.

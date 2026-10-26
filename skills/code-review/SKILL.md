@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Use before pushing anything beyond a small change, after a risky change (auth, permissions, data isolation, schema, money, secrets, integrations), when stuck and a fresh view would help, and whenever you receive review feedback from a reviewer, the user or a pull request.
+description: "Use before pushing anything beyond a small change, after a risky change (auth, permissions, data isolation, schema, money, secrets, integrations), when stuck and a fresh view would help, and whenever you receive review feedback from a reviewer, the user or a pull request."
 ---
 
 # Code review

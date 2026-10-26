@@ -1,6 +1,6 @@
 ---
 name: project-kickoff
-description: Use when a new project starts, or the first time Quimera is used in an existing project (no project profile at the top of AGENTS.md yet). Sets the working mode, git identity, where Quimera files live, the product's audience and languages, and creates the memory files.
+description: "Use when a new project starts, or the first time Quimera is used in an existing project (no project profile at the top of AGENTS.md yet). Sets the working mode, git identity, where Quimera files live, the product's audience and languages, and creates the memory files."
 ---
 
 # Project kickoff

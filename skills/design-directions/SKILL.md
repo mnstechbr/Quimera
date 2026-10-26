@@ -1,6 +1,6 @@
 ---
 name: design-directions
-description: Use before the first screen of a product with a UI, when creating or changing a visual identity, before a major new surface (dashboard, onboarding, landing page), or when the user asks for design options. Also read it before building any later screen, to follow docs/DESIGN.md.
+description: "Use before the first screen of a product with a UI, when creating or changing a visual identity, before a major new surface (dashboard, onboarding, landing page), or when the user asks for design options. Also read it before building any later screen, to follow docs/DESIGN.md."
 ---
 
 # Design directions

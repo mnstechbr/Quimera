@@ -1,6 +1,6 @@
 ---
 name: vision-review
-description: Use after the approach is chosen (kickoff) and again at the end of each phase: a senior review of docs/VISION.md that finds the gaps that would hurt later, asks about them one at a time with a recommendation, records dated answers, and ends with a readiness verdict.
+description: "Use after the approach is chosen (kickoff) and again at the end of each phase: a senior review of docs/VISION.md that finds the gaps that would hurt later, asks about them one at a time with a recommendation, records dated answers, and ends with a readiness verdict."
 ---
 
 # Vision review

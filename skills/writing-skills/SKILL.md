@@ -1,6 +1,6 @@
 ---
 name: writing-skills
-description: Use when a new skill seems needed, when the user asks for a skill, when adopting a skill from another repository or registry, or when editing an existing skill because agents keep getting a process wrong.
+description: "Use when a new skill seems needed, when the user asks for a skill, when adopting a skill from another repository or registry, or when editing an existing skill because agents keep getting a process wrong."
 ---
 
 # Writing skills
