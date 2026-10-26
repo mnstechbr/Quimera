@@ -1,6 +1,6 @@
 {
   "name": "quimera-kit",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A small, local-first development standard for one owner working with several AI coding tools: decisions live in the repository, the git history stays yours, and nothing counts as done without evidence.",
   "license": "MIT",
   "author": "Jean Vitor <mnstechbr@outlook.com>",

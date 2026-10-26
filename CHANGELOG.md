@@ -2,7 +2,7 @@
 
 All notable changes to Quimera. Versions follow `package.json`; install a release by its tag, for example `npx github:mnstechbr/Quimera#v0.4.0`.
 
-## 0.4.0 · unreleased
+## 0.4.0 · 2026-10-26
 
 The method now runs after kickoff, the scripts never report success without evidence, and the installer never leaves the project. Built from an external assessment and from two real projects started with 0.3.0; the plan is in `docs/plans/2026-10-26-release-0.4.0.md` in the kit repository.
 

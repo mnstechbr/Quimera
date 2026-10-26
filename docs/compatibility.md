@@ -9,7 +9,7 @@ What has been tried in a real session, how, and what rests only on each tool's d
 
 | Tool | Version | Date | Status | Kit | What was checked | Result |
 |---|---|---|---|---|---|---|
-| Claude Code | 2.1.310 | 2026-10-26 | tested | commit `90fa1b8` (work toward 0.4.0) | `quimera init --tools=claude` in a fresh repository; then a non-interactive session on the fast tier asked for the skills in `.claude/skills/`, the agents in `.claude/agents/`, and to load `verification` | 15 of 15 skills and 6 of 6 role agents listed; `verification` loaded from `.claude/skills/verification` |
+| Claude Code | 2.1.310 | 2026-10-26 | tested | commit `4a898d1` (work toward 0.4.0) | `quimera init --tools=claude` in a fresh repository; then a non-interactive session on the fast tier asked for the skills in `.claude/skills/`, the agents in `.claude/agents/`, and to load `verification` | 15 of 15 skills and 6 of 6 role agents listed; `verification` loaded from `.claude/skills/verification` |
 | Codex | — | — | experimental | — | not tried yet | — |
 | GitHub Copilot | — | — | experimental | — | not tried yet | — |
 | Google Antigravity | — | — | experimental | — | not tried yet | — |
