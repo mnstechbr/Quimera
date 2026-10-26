@@ -152,6 +152,19 @@ export function checkContent(root) {
     }
   }
 
+  // ---------- evaluation scenarios: complete, and pointing to rules that exist ----------
+  const SCENARIO_FIELDS = ['Seen in', 'Setup', 'Expected', 'Evidence', 'Rules', 'Never'];
+  for (const file of walk(join(root, 'evals', 'scenarios')).filter((p) => p.endsWith('.md'))) {
+    const lines = annotate(readFileSync(file, 'utf8'));
+    const missing = SCENARIO_FIELDS.filter((f) => !lines.some((l) => l.text.startsWith(`**${f}:**`)));
+    if (missing.length) error(file, 1, 'scenario-fields', `missing ${missing.map((f) => `"${f}"`).join(', ')}`);
+    for (const l of lines.filter((l) => l.text.startsWith('**Rules:**'))) {
+      for (const [, path] of l.text.matchAll(/`([^`]+)`/g)) {
+        if (/^[\w./-]+\.(md|mjs|json)$/.test(path) && !existsSync(join(root, path))) error(file, l.line, 'reference-exists', `${path} does not exist in the kit`);
+      }
+    }
+  }
+
   return out.sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line);
 }
 

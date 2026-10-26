@@ -120,3 +120,29 @@ test('every skill frontmatter parses with PyYAML, when it is available', (t) => 
     assert.equal(r.status, 0, `${name}: ${r.stderr}`);
   }
 });
+
+const GOOD_SCENARIO = [
+  '# Sample scenario',
+  '',
+  '**Seen in:** a pilot project, rewritten.',
+  '**Setup:** a fresh repository.',
+  '**Expected:** one next action.',
+  '**Evidence:** what to look for.',
+  '**Rules:** `skills/sample/SKILL.md`',
+  '**Never:** what must not happen.',
+  '',
+].join('\n');
+
+test('evaluation scenarios carry every field and point to rules that exist', (t) => {
+  const kit = makeKit(t, { 'skills/sample/SKILL.md': GOOD_SKILL, 'evals/scenarios/01-sample.md': GOOD_SCENARIO });
+  assert.deepEqual(rules(kit), []);
+  const missing = makeKit(t, { 'skills/sample/SKILL.md': GOOD_SKILL, 'evals/scenarios/01-sample.md': GOOD_SCENARIO.replace('**Never:** what must not happen.\n', '') });
+  assert.deepEqual(rules(missing), ['scenario-fields@1']);
+  const dangling = makeKit(t, { 'skills/sample/SKILL.md': GOOD_SKILL, 'evals/scenarios/01-sample.md': GOOD_SCENARIO.replace('skills/sample/SKILL.md', 'skills/gone/SKILL.md') });
+  assert.deepEqual(rules(dangling), ['reference-exists@7']);
+});
+
+test('the kit ships at least twelve evaluation scenarios', () => {
+  const names = readdirSync(join(KIT, 'evals', 'scenarios')).filter((f) => f.endsWith('.md'));
+  assert.ok(names.length >= 12, `${names.length} scenarios`);
+});
